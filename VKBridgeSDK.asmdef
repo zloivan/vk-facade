@@ -1,7 +1,9 @@
 {
     "name": "VKBridgeSDK",
     "rootNamespace": "VKBridgeSDK",
-    "references": [],
+    "references": [
+        "UniTask"
+    ],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
