@@ -3,6 +3,7 @@ using VKBridgeSDK.Runtime;
 
 namespace VKBridgeSDK.Editor
 {
+
     [InitializeOnLoad]
     public class StaticClassCleaner
     {
@@ -19,4 +20,5 @@ namespace VKBridgeSDK.Editor
             }
         }
     }
+
 }

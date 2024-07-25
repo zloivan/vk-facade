@@ -15,11 +15,6 @@ namespace VKBridgeSDK.Runtime
         private static GameObject _messageReceiverObject;
         private static VKMessageReceiver _vkMessageReceiver;
 
-        // static VkBridgeFacade()
-        // {
-        //     Initialize();
-        // }
-
         public static void Initialize()
         {
             _vkResponseManager = new VKResponseManager();
@@ -45,6 +40,21 @@ namespace VKBridgeSDK.Runtime
         public static async UniTask<bool> VkBridgeInit()
         {
             var vkPromise = await _vkResponseManager.CallVkMethodAsync("VKWebAppInit");
+            return vkPromise._vkPromiseData.result;
+        }
+
+        public static async UniTask<bool> ShowLeaderBoard(int result = -1)
+        {
+            VKPromise vkPromise;
+            if (result == -1)
+            {
+                 vkPromise = await _vkResponseManager.CallVkMethodAsync("VKWebAppShowLeaderBoardBox");
+            }
+            else
+            {
+                vkPromise = await _vkResponseManager.CallVkMethodAsync("VKWebAppShowLeaderBoardBox", new {user_result = result}); 
+            }
+             
             return vkPromise._vkPromiseData.result;
         }
 
