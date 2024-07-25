@@ -1,6 +1,7 @@
 using UnityEditor;
+using VKBridgeSDK.Runtime;
 
-namespace VKBridgeSDK.VKBridgeSDK.Editor
+namespace VKBridgeSDK.Editor
 {
     [InitializeOnLoad]
     public class StaticClassCleaner
