@@ -34,12 +34,17 @@ namespace VKBridgeSDK.Runtime.managers
             }
         }
 
+
         public async UniTask<VKPromise> CallVkMethodAsync(string methodName, params object[] parameters)
         {
             var taskCompletionSource = new UniTaskCompletionSource<VKPromise>();
             _promiseTasks[methodName] = taskCompletionSource;
 
-            var paramsString = parameters.Length > 0 ? JsonUtility.ToJson(parameters) : string.Empty;
+            var paramsString = parameters.Length > 0
+                ? Newtonsoft.Json.JsonConvert.SerializeObject(parameters)
+                : string.Empty;
+
+
             if (!Application.isEditor)
             {
                 UnityVKBridge_SendMessage(methodName, paramsString);
@@ -50,30 +55,29 @@ namespace VKBridgeSDK.Runtime.managers
                 taskCompletionSource.TrySetResult(
                     new VKPromise
                     {
-                        method = methodName, 
-                        _vkPromiseData = new VKPromiseData
+                        method = methodName,
+                        data = new VKPromiseData
                         {
                             result = true
-                        }}
-                    );
-                
+                        }
+                    }
+                );
+
                 Debug.Log($"VKBridge.send({methodName}, {paramsString}) called");
             }
-            
+
 
             return await taskCompletionSource.Task;
         }
 
+
         public void HandlePromiseResponse(string jsonData)
         {
-            Debug.Log($"Promise response came: {jsonData}");
-            
+
             var response = JsonUtility.FromJson<VKPromise>(jsonData);
 
             Debug.Log("Response parsed for " + response.method);
 
-            Debug.Log($"Promise tasks keys: {string.Join(" ",_promiseTasks.Keys)}");
-            
             if (!_promiseTasks.TryGetValue(response.method, out var tcs))
                 return;
 
@@ -90,7 +94,7 @@ namespace VKBridgeSDK.Runtime.managers
             var data = response.error.data.error_data;
             var errorMessage = !string.IsNullOrEmpty(data.error_description) ? data.error_description :
                 !string.IsNullOrEmpty(data.error_msg) ? data.error_msg : data.error_reason;
-        
+
             tcs.TrySetException(new Exception(errorMessage));
             _promiseTasks.Remove(response.method);
         }
@@ -108,4 +112,3 @@ namespace VKBridgeSDK.Runtime.managers
         }
     }
 }
-

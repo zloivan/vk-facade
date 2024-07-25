@@ -15,7 +15,7 @@ mergeInto(LibraryManager.library, {
                         var dataStr = JSON.stringify({ method: methodName, data: data });
                         console.log('Data after parse : ',dataStr);
                         gameInstance.SendMessage('VKMessageReceiver', 'ReceivePromise', dataStr);
-                        onsole.log('Send message to unity...');
+                        console.log('Send message to unity...');
                     })
                     .catch(function(error) {
                         console.log('Got inside error: ',error);
@@ -50,18 +50,18 @@ mergeInto(LibraryManager.library, {
 
     UnityVKBridge_SetupFocusHandlers: function() {
         window.addEventListener('focus', function() {
-            unityInstance.SendMessage('VKMessageReceiver', 'OnFocus');
+            gameInstance.SendMessage('VKMessageReceiver', 'OnFocus');
         });
 
         window.addEventListener('blur', function() {
-            unityInstance.SendMessage('VKMessageReceiver', 'OnBlur');
+            gameInstance.SendMessage('VKMessageReceiver', 'OnBlur');
         });
 
         document.addEventListener('visibilitychange', function() {
             if (document.hidden) {
-                unityInstance.SendMessage('VKMessageReceiver', 'OnBlur');
+                gameInstance.SendMessage('VKMessageReceiver', 'OnBlur');
             } else {
-                unityInstance.SendMessage('VKMessageReceiver', 'OnFocus');
+                gameInstance.SendMessage('VKMessageReceiver', 'OnFocus');
             }
         });
     }

@@ -6,11 +6,11 @@ namespace VKBridgeSDK.Runtime.data
     public class VKPromise
     {
         public string method;
-        public VKPromiseData _vkPromiseData;
+        public VKPromiseData data;
 
         public override string ToString()
         {
-            return $"{nameof(method)}: {method}, {nameof(_vkPromiseData)}: {_vkPromiseData}";
+            return $"{nameof(method)}: {method}, {nameof(data)}: {data}";
         }
     }
 
@@ -41,7 +41,7 @@ namespace VKBridgeSDK.Runtime.data
         public bool success;
         public string[] notSentIds;
         public string requestKey;
-
+        
         public override string ToString()
         {
             return

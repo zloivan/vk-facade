@@ -51,21 +51,24 @@ namespace VKBridgeSDK.Runtime.components
             {
                 ShowLeaderboard().Forget();
             }
+
             //
-            // if (GUILayout.Button("Show invite box"))
-            // {
-            //     ShowInviteBox();
-            // }
+            if (GUILayout.Button("Show leaderboard with 100 points"))
+            {
+                ShowLeaderboardWith100Points().Forget();
+            }
+
             //
-            // if (GUILayout.Button("Show Alert"))
-            // {
-            //     ShowAlertMessageBox();
-            // }
+            if (GUILayout.Button("Invite Friend"))
+            {
+                InviteFriend().Forget();
+            }
+
             //
-            // if (GUILayout.Button("Check Reward Ads"))
-            // {
-            //     CheckRewards();
-            // }
+            if (GUILayout.Button("Recommend app"))
+            {
+                RecomendApp().Forget();
+            }
             //
             // if (GUILayout.Button("Check Interstitial Ads"))
             // {
@@ -121,19 +124,137 @@ namespace VKBridgeSDK.Runtime.components
                 Debug.LogError(e);
             }
         }
+
+        public async UniTaskVoid ShowLeaderboardWith100Points()
+        {
+            try
+            {
+                if (await VkBridgeFacade.ShowLeaderBoard(100)) Debug.Log("Leaderboard shown");
+            }
+            catch (Exception e)
+            {
+                Debug.LogError(e);
+            }
+        }
+        
+        //check banner ad
+        public async UniTaskVoid CheckBannerAd()
+        {
+            try
+            {
+                if (await VkBridgeFacade.CheckBannerAd()) Debug.Log("Banner ad is shown");
+            }
+            catch (Exception e)
+            {
+                Debug.LogError(e);
+            }
+        }
+        
+        //hide banner ad
+        public async UniTaskVoid HideBannerAd()
+        {
+            try
+            {
+                if (await VkBridgeFacade.HideBannerAd()) Debug.Log("Banner ad is hidden");
+            }
+            catch (Exception e)
+            {
+                Debug.LogError(e);
+            }
+        }
+        
+        //show the banner
+        public async UniTaskVoid ShowBannerAd()
+        {
+            try
+            {
+                if (await VkBridgeFacade.ShowBannerAd()) Debug.Log("Banner ad is shown");
+            }
+            catch (Exception e)
+            {
+                Debug.LogError(e);
+            }
+        }
+        
+        //show native ad interstitial
+        public async UniTaskVoid ShowInterstitial()
+        {
+            try
+            {
+                if (await VkBridgeFacade.ShowNativeInterstitialAd()) Debug.Log("Interstitial ad is shown");
+            }
+            catch (Exception e)
+            {
+                Debug.LogError(e);
+            }
+        }
+        
+        //show native ad rewarded video
+        public async UniTaskVoid ShowReward()
+        {
+            try
+            {
+                if (await VkBridgeFacade.ShowNativeRewardAd()) Debug.Log("Reward ad is shown");
+            }
+            catch (Exception e)
+            {
+                Debug.LogError(e);
+            }
+        }
+
+        public async UniTaskVoid CheckNativeRewardAd()
+        {
+            try
+            {
+                if (await VkBridgeFacade.CheckNativeRewardAd()) Debug.Log("Reward ad is shown");
+            }
+            catch (Exception e)
+            {
+                Debug.LogError(e);
+            }
+        }
+
+        public async UniTaskVoid CheckNativeInterstitialAd()
+        {
+            try
+            {
+                if (await VkBridgeFacade.CheckNativeInterstitialAd()) Debug.Log("Interstitial ad is shown");
+            }
+            catch (Exception e)
+            {
+                Debug.LogError(e);
+            }
+        }
+
         //
-        // public void ShowAlertMessageBox()
-        // {
-        //     VKBridgeHandler.Alert("Alert Works!");
-        // }
+        public async UniTaskVoid InviteFriend()
+        {
+            try
+            {
+                if (await VkBridgeFacade.InviteFriend()) Debug.Log("InviteFriend shown");
+            }
+            catch (Exception e)
+            {
+                Debug.LogError(e);
+                throw;
+            }
+        }
+
         //
-        // public void CheckRewards()
-        // {
-        //     VKBridgeHandler.CheckRewardsAvailable(status =>
-        //     {
-        //         VKBridgeHandler.Alert($"Reward {status}");
-        //     });
-        // }
+        public async UniTaskVoid RecomendApp()
+        {
+            try
+            {
+                if (await VkBridgeFacade.RecommendApp())
+                {
+                    Debug.Log("App was recomended");
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.LogError(e);
+            }
+        }
         //
         // public void CheckInterstitials()
         // {
