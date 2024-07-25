@@ -4,6 +4,5 @@ namespace VKBridgeSDK.Runtime.data
     {
         Undefined,
         FocusChanged,
-        BlurChanged
     }
 }

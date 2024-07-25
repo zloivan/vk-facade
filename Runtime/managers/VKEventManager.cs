@@ -1,12 +1,31 @@
 using System;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
+using UnityEngine;
 using VKBridgeSDK.Runtime.data;
 
 namespace VKBridgeSDK.Runtime.managers
 {
     public class VKEventManager
     {
-        private readonly Dictionary<VKBridgeEventType, Action<VKPromiseData>> _eventListeners = new Dictionary<VKBridgeEventType, Action<VKPromiseData>>();
+        private readonly Dictionary<VKBridgeEventType, Action<VKPromiseData>> _eventListeners =
+            new Dictionary<VKBridgeEventType, Action<VKPromiseData>>();
+
+        [DllImport("__Internal")]
+        private static extern void UnityVKBridge_Subscribe();
+
+        public VKEventManager()
+        {
+            SubscribeToVkBridgeEvents();
+        }
+
+        private static void SubscribeToVkBridgeEvents()
+        {
+            if (!Application.isEditor)
+            {
+                UnityVKBridge_Subscribe();
+            }
+        }
 
         public void AddEventListener(VKBridgeEventType eventType, Action<VKPromiseData> listener)
         {
@@ -22,9 +41,9 @@ namespace VKBridgeSDK.Runtime.managers
 
         public void RemoveEventListener(VKBridgeEventType eventType, Action<VKPromiseData> listener)
         {
-            if (!_eventListeners.ContainsKey(eventType)) 
+            if (!_eventListeners.ContainsKey(eventType))
                 return;
-        
+
             _eventListeners[eventType] -= listener;
             if (_eventListeners[eventType] == null)
             {

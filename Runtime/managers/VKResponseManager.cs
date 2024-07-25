@@ -16,9 +16,6 @@ namespace VKBridgeSDK.Runtime.managers
         private static extern void UnityVKBridge_SendMessage(string methodName, string parameters);
 
         [DllImport("__Internal")]
-        private static extern void UnityVKBridge_Subscribe();
-
-        [DllImport("__Internal")]
         private static extern void UnityVKBridge_Alert(string message);
 
         [DllImport("__Internal")]
@@ -26,8 +23,15 @@ namespace VKBridgeSDK.Runtime.managers
 
         public VKResponseManager()
         {
-            UnityVKBridge_SetupFocusHandlers();
-            UnityVKBridge_Subscribe();
+            SetupFocusHandlers();
+        }
+
+        private static void SetupFocusHandlers()
+        {
+            if (!Application.isEditor)
+            {
+                UnityVKBridge_SetupFocusHandlers();
+            }
         }
 
         public async UniTask<VKPromise> CallVkMethodAsync(string methodName, params object[] parameters)
@@ -36,15 +40,40 @@ namespace VKBridgeSDK.Runtime.managers
             _promiseTasks[methodName] = taskCompletionSource;
 
             var paramsString = parameters.Length > 0 ? JsonUtility.ToJson(parameters) : string.Empty;
-            UnityVKBridge_SendMessage(methodName, paramsString);
+            if (!Application.isEditor)
+            {
+                UnityVKBridge_SendMessage(methodName, paramsString);
+            }
+            else
+            {
+                UniTask.Delay(300);
+                taskCompletionSource.TrySetResult(
+                    new VKPromise
+                    {
+                        method = methodName, 
+                        _vkPromiseData = new VKPromiseData
+                        {
+                            result = true
+                        }}
+                    );
+                
+                Debug.Log($"VKBridge.send({methodName}, {paramsString}) called");
+            }
+            
 
             return await taskCompletionSource.Task;
         }
 
         public void HandlePromiseResponse(string jsonData)
         {
+            Debug.Log($"Promise response came: {jsonData}");
+            
             var response = JsonUtility.FromJson<VKPromise>(jsonData);
 
+            Debug.Log("Response parsed for " + response.method);
+
+            Debug.Log($"Promise tasks keys: {string.Join(" ",_promiseTasks.Keys)}");
+            
             if (!_promiseTasks.TryGetValue(response.method, out var tcs))
                 return;
 
@@ -68,7 +97,14 @@ namespace VKBridgeSDK.Runtime.managers
 
         public void ShowAlert(string message)
         {
-            UnityVKBridge_Alert(message);
+            if (!Application.isEditor)
+            {
+                UnityVKBridge_Alert(message);
+            }
+            else
+            {
+                Debug.Log($"VKBridge.alert({message}) called");
+            }
         }
     }
 }

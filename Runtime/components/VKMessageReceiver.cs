@@ -50,6 +50,7 @@ namespace VKBridgeSDK.Runtime.components
         public void OnBlur()
         {
             Debug.Log("Browser window lost focus");
+            _eventManager.TriggerEvent(VKBridgeEventType.FocusChanged, new VKPromiseData { result = false });
         }
     }
 }

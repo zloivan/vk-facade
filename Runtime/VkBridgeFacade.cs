@@ -15,16 +15,30 @@ namespace VKBridgeSDK.Runtime
         private static GameObject _messageReceiverObject;
         private static VKMessageReceiver _vkMessageReceiver;
 
+        public const bool IsDebug = true;
+
         public static void Initialize()
         {
             _vkResponseManager = new VKResponseManager();
             _eventManager = new VKEventManager();
 
-            _messageReceiverObject = new GameObject("MessageReceiver");
+            _messageReceiverObject = new GameObject("VKMessageReceiver");
             _vkMessageReceiver = _messageReceiverObject.AddComponent<VKMessageReceiver>();
             _vkMessageReceiver.Initialize(_vkResponseManager, _eventManager);
 
             Object.DontDestroyOnLoad(_messageReceiverObject);
+
+            if (IsDebug)
+            {
+                SpawnDebugMenu();
+            }
+        }
+
+        private static void SpawnDebugMenu()
+        {
+            var go = new GameObject("VKDebugMenu");
+            go.AddComponent<VKBridgeDebugMenu>();
+            Object.DontDestroyOnLoad(go);
         }
 
         public static async UniTask<VKPromise> GetUserInfo()

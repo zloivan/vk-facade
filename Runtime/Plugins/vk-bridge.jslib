@@ -3,18 +3,32 @@ mergeInto(LibraryManager.library, {
         var methodName = UTF8ToString(methodNamePtr);
         var params = UTF8ToString(paramsPtr);
 
-        if (typeof vkBridge !== 'undefined') {
-            vkBridge.send(methodName, JSON.parse(params))
-                .then(function(data) {
-                    var dataStr = JSON.stringify({ method: methodName, data: data });
-                    gameInstance.SendMessage('MessageReceiver', 'ReceivePromise', dataStr);
-                })
-                .catch(function(error) {
-                    var errorStr = JSON.stringify({ method: methodName, error: error });
-                    gameInstance.SendMessage('MessageReceiver', 'ReceiveError', errorStr);
-                });
-        } else {
-            console.error('vkBridge is not defined. Make sure vkBridge is loaded.');
+        try {
+            console.log('Method name: ',methodName);
+            console.log('Params before parse: ',params);
+            var parsedParams = params ? JSON.parse(params) : {};
+            console.log('Params after parse: ',parsedParams);
+            if (typeof vkBridge !== 'undefined') {
+                vkBridge.send(methodName, parsedParams)
+                    .then(function(data) {
+                        console.log('Got inside then: ',data);
+                        var dataStr = JSON.stringify({ method: methodName, data: data });
+                        console.log('Data after parse : ',dataStr);
+                        gameInstance.SendMessage('VKMessageReceiver', 'ReceivePromise', dataStr);
+                        onsole.log('Send message to unity...');
+                    })
+                    .catch(function(error) {
+                        console.log('Got inside error: ',error);
+                        var errorStr = JSON.stringify({ method: methodName, error: error });
+                        console.log('Error after parse: ',errorStr);
+                        gameInstance.SendMessage('VKMessageReceiver', 'ReceiveError', errorStr);
+                        console.log('Send message to unity...');
+                    });
+            } else {
+                console.error('vkBridge is not defined. Make sure vkBridge is loaded.');
+            }
+        } catch (e) {
+            console.error('JSON parse error:', e);
         }
     },
 
@@ -22,7 +36,7 @@ mergeInto(LibraryManager.library, {
         if (typeof vkBridge !== 'undefined') {
             vkBridge.subscribe(function(event) {
                 var eventStr = JSON.stringify(event);
-                gameInstance.SendMessage('MessageReceiver', 'ReceiveEvent', eventStr);
+                gameInstance.SendMessage('VKMessageReceiver', 'ReceiveEvent', eventStr);
             });
         } else {
             console.error('vkBridge is not defined. Make sure vkBridge is loaded.');
@@ -36,11 +50,19 @@ mergeInto(LibraryManager.library, {
 
     UnityVKBridge_SetupFocusHandlers: function() {
         window.addEventListener('focus', function() {
-            gameInstance.SendMessage('MessageReceiver', 'OnFocus');
+            unityInstance.SendMessage('VKMessageReceiver', 'OnFocus');
         });
 
         window.addEventListener('blur', function() {
-            gameInstance.SendMessage('MessageReceiver', 'OnBlur');
+            unityInstance.SendMessage('VKMessageReceiver', 'OnBlur');
+        });
+
+        document.addEventListener('visibilitychange', function() {
+            if (document.hidden) {
+                unityInstance.SendMessage('VKMessageReceiver', 'OnBlur');
+            } else {
+                unityInstance.SendMessage('VKMessageReceiver', 'OnFocus');
+            }
         });
     }
 });

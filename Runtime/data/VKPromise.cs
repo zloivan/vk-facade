@@ -7,6 +7,11 @@ namespace VKBridgeSDK.Runtime.data
     {
         public string method;
         public VKPromiseData _vkPromiseData;
+
+        public override string ToString()
+        {
+            return $"{nameof(method)}: {method}, {nameof(_vkPromiseData)}: {_vkPromiseData}";
+        }
     }
 
     [Serializable]
@@ -36,6 +41,12 @@ namespace VKBridgeSDK.Runtime.data
         public bool success;
         public string[] notSentIds;
         public string requestKey;
+
+        public override string ToString()
+        {
+            return
+                $"{nameof(result)}: {result}, {nameof(reason)}: {reason}, {nameof(banner_width)}: {banner_width}, {nameof(banner_height)}: {banner_height}, {nameof(banner_location)}: {banner_location}, {nameof(banner_align)}: {banner_align}, {nameof(orientation)}: {orientation}, {nameof(layout_type)}: {layout_type}, {nameof(success)}: {success}, {nameof(notSentIds)}: {notSentIds}, {nameof(requestKey)}: {requestKey}";
+        }
     }
 
     public class VkPromiseError
