@@ -4,5 +4,28 @@ namespace VKBridgeSDK.Runtime.data
     {
         Undefined,
         FocusChanged,
+        VKWebAppAddToProfileResult,
+        VKWebAppAddToProfileFailed,
+        VKWebAppRecommendResult,
+        VKWebAppRecommendFailed,
+        VKWebAppShowWallPostBoxFailed,
+        VKWebAppShowWallPostBoxResult,
+        VKWebAppShowNativeAdsResult,
+        VKWebAppShowNativeAdsFailed,
+        VKWebAppShowBannerAdResult,
+        VKWebAppShowBannerAdFailed,
+        VKWebAppBannerAdUpdated,
+        VKWebAppHideBannerAd,
+        VKWebAppBannerAdClosedByUser,
+        VKWebAppShowInviteBoxResult,
+        VKWebAppShowInviteBoxFailed,
+        VKWebAppShowLeaderBoardResult,
+        VKWebAppShowLeaderBoardFailed,
+        VKWebAppShowRequestBoxResult,
+        VKWebAppShowRequestBoxFailed,
+        VKWebAppGetFriendsResult,
+        VKWebAppGetFriendsFailed,
+        VKWebAppGetUserInfoResult,
+        VKWebAppGetUserInfoFailed
     }
 }

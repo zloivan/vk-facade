@@ -33,6 +33,8 @@ namespace VKBridgeSDK.Runtime.components
             _showDebugMenu = !_showDebugMenu;
         }
 
+        private Vector2 scrollPosition = Vector2.zero;
+
         private void DrawDebugMenu()
         {
             var menuWidth = 200f;
@@ -41,6 +43,9 @@ namespace VKBridgeSDK.Runtime.components
             var menuY = (Screen.height - menuHeight) / 2f;
 
             GUILayout.BeginArea(new Rect(menuX, menuY, menuWidth, menuHeight), "VK Debug Menu", GUI.skin.window);
+
+            scrollPosition = GUILayout.BeginScrollView(scrollPosition, GUILayout.Width(menuWidth),
+                GUILayout.Height(menuHeight));
 
             if (GUILayout.Button("Test alert"))
             {
@@ -67,53 +72,55 @@ namespace VKBridgeSDK.Runtime.components
             //
             if (GUILayout.Button("Recommend app"))
             {
-                RecomendApp().Forget();
+                RecommendApp().Forget();
             }
-            //
-            // if (GUILayout.Button("Check Interstitial Ads"))
-            // {
-            //     CheckInterstitials();
-            // }
-            //
-            // if (GUILayout.Button("Show Reward Ads"))
-            // {
-            //     ShowReward();
-            // }
-            //
-            // if (GUILayout.Button("Show Interstitial Ads"))
-            // {
-            //     ShowInterstitial();
-            // }
-            //
-            // if (GUILayout.Button("Show Banner Ad"))
-            // {
-            //     ShowBannerAd();
-            // }
-            //
-            // if (GUILayout.Button("Check Banner Ad"))
-            // {
-            //     CheckBannerAd();
-            // }
-            //
-            // if (GUILayout.Button("Hide Banner Ad"))
-            // {
-            //     HideBannerAd();
-            // }
-            //
-            // if (GUILayout.Button("Track test event in MyTarget"))
-            // {
-            //     TrackTestEventInMyTarget();
-            // }
 
+            if (GUILayout.Button("Check banner ad"))
+            {
+                CheckBannerAd().Forget();
+            }
+
+            if (GUILayout.Button("Hide banner ad"))
+            {
+                HideBannerAd().Forget();
+            }
+
+            if (GUILayout.Button("Check interstitial ad"))
+            {
+                CheckNativeInterstitialAd().Forget();
+            }
+
+            if (GUILayout.Button("Show interstitial ad"))
+            {
+                ShowInterstitial().Forget();
+            }
+
+            if (GUILayout.Button("Show interstitial ad"))
+            {
+                ShowReward().Forget();
+            }
+
+            if (GUILayout.Button("Show Banner Ad"))
+            {
+                ShowBannerAd().Forget();
+            }
+
+            if (GUILayout.Button("Check Native Reward Ad"))
+            {
+                CheckNativeRewardAd().Forget();
+            }
+
+            // End the scroll view
+            GUILayout.EndScrollView();
             GUILayout.EndArea();
         }
 
-        public void TestAlert()
+        private void TestAlert()
         {
             VkBridgeFacade.ShowAlert("Alert works");
         }
 
-        public async UniTaskVoid ShowLeaderboard()
+        private async UniTaskVoid ShowLeaderboard()
         {
             try
             {
@@ -125,7 +132,7 @@ namespace VKBridgeSDK.Runtime.components
             }
         }
 
-        public async UniTaskVoid ShowLeaderboardWith100Points()
+        private async UniTaskVoid ShowLeaderboardWith100Points()
         {
             try
             {
@@ -136,9 +143,8 @@ namespace VKBridgeSDK.Runtime.components
                 Debug.LogError(e);
             }
         }
-        
-        //check banner ad
-        public async UniTaskVoid CheckBannerAd()
+
+        private async UniTaskVoid CheckBannerAd()
         {
             try
             {
@@ -149,9 +155,8 @@ namespace VKBridgeSDK.Runtime.components
                 Debug.LogError(e);
             }
         }
-        
-        //hide banner ad
-        public async UniTaskVoid HideBannerAd()
+
+        private async UniTaskVoid HideBannerAd()
         {
             try
             {
@@ -162,9 +167,8 @@ namespace VKBridgeSDK.Runtime.components
                 Debug.LogError(e);
             }
         }
-        
-        //show the banner
-        public async UniTaskVoid ShowBannerAd()
+
+        private async UniTaskVoid ShowBannerAd()
         {
             try
             {
@@ -175,9 +179,8 @@ namespace VKBridgeSDK.Runtime.components
                 Debug.LogError(e);
             }
         }
-        
-        //show native ad interstitial
-        public async UniTaskVoid ShowInterstitial()
+
+        private async UniTaskVoid ShowInterstitial()
         {
             try
             {
@@ -188,9 +191,8 @@ namespace VKBridgeSDK.Runtime.components
                 Debug.LogError(e);
             }
         }
-        
-        //show native ad rewarded video
-        public async UniTaskVoid ShowReward()
+
+        private async UniTaskVoid ShowReward()
         {
             try
             {
@@ -202,11 +204,11 @@ namespace VKBridgeSDK.Runtime.components
             }
         }
 
-        public async UniTaskVoid CheckNativeRewardAd()
+        private async UniTaskVoid CheckNativeRewardAd()
         {
             try
             {
-                if (await VkBridgeFacade.CheckNativeRewardAd()) Debug.Log("Reward ad is shown");
+                if (await VkBridgeFacade.CheckNativeRewardAd()) Debug.Log("Reward ad is ready");
             }
             catch (Exception e)
             {
@@ -214,11 +216,11 @@ namespace VKBridgeSDK.Runtime.components
             }
         }
 
-        public async UniTaskVoid CheckNativeInterstitialAd()
+        private async UniTaskVoid CheckNativeInterstitialAd()
         {
             try
             {
-                if (await VkBridgeFacade.CheckNativeInterstitialAd()) Debug.Log("Interstitial ad is shown");
+                if (await VkBridgeFacade.CheckNativeInterstitialAd()) Debug.Log("Interstitial ad is ready");
             }
             catch (Exception e)
             {
@@ -226,8 +228,7 @@ namespace VKBridgeSDK.Runtime.components
             }
         }
 
-        //
-        public async UniTaskVoid InviteFriend()
+        private async UniTaskVoid InviteFriend()
         {
             try
             {
@@ -241,7 +242,7 @@ namespace VKBridgeSDK.Runtime.components
         }
 
         //
-        public async UniTaskVoid RecomendApp()
+        private async UniTaskVoid RecommendApp()
         {
             try
             {
@@ -255,49 +256,19 @@ namespace VKBridgeSDK.Runtime.components
                 Debug.LogError(e);
             }
         }
-        //
-        // public void CheckInterstitials()
-        // {
-        //     VKBridgeHandler.CheckInterstitialAvailable(status =>
-        //     {
-        //         VKBridgeHandler.Alert($"Reward {status}");
-        //     });
-        // }
-        //
-        //
-        // public void ShowReward()
-        // {
-        //     VKBridgeHandler.ShowReward();
-        // }
-        //
-        // public void ShowInterstitial()
-        // {
-        //     VKBridgeHandler.ShowInterstitial();
-        // }
-        //
-        // public void ShowBannerAd()
-        // {
-        //     VKBridgeHandler.ShowBannerAd();
-        // }
-        //
-        // public void CheckBannerAd()
-        // {
-        //     VKBridgeHandler.CheckBannerAd();
-        // }
-        //
-        // public void HideBannerAd()
-        // {
-        //     VKBridgeHandler.HideBannerAd();
-        // }
-        //
-        // public void ShowInviteBox()
-        // {
-        //     VKBridgeHandler.ShowInviteBox();
-        // }
-        //
-        // public void TrackTestEventInMyTarget()
-        // {
-        //     VKBridgeHandler.TrackMyTrackerEvent("test_event");
-        // }
+
+        private async UniTaskVoid PublishPostOnWall()
+        {
+            try
+            {
+                if (await VkBridgeFacade.PublishPostOnWall("Побьете мой рекорд?", "https://vk.com/app52010090", true))
+                    Debug.Log("Post was published on wall");
+            }
+            catch (Exception e)
+            {
+                Debug.LogError(e);
+                throw;
+            }
+        }
     }
 }

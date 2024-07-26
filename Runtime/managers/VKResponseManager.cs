@@ -73,7 +73,6 @@ namespace VKBridgeSDK.Runtime.managers
 
         public void HandlePromiseResponse(string jsonData)
         {
-
             var response = JsonUtility.FromJson<VKPromise>(jsonData);
 
             Debug.Log("Response parsed for " + response.method);

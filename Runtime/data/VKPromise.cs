@@ -41,12 +41,41 @@ namespace VKBridgeSDK.Runtime.data
         public bool success;
         public string[] notSentIds;
         public string requestKey;
+        public int post_id;
+        public VKUserData[] users;
         
+
         public override string ToString()
         {
             return
                 $"{nameof(result)}: {result}, {nameof(reason)}: {reason}, {nameof(banner_width)}: {banner_width}, {nameof(banner_height)}: {banner_height}, {nameof(banner_location)}: {banner_location}, {nameof(banner_align)}: {banner_align}, {nameof(orientation)}: {orientation}, {nameof(layout_type)}: {layout_type}, {nameof(success)}: {success}, {nameof(notSentIds)}: {notSentIds}, {nameof(requestKey)}: {requestKey}";
         }
+    }
+
+    [Serializable]
+    public class VKUserData
+    {
+        public int id;
+        public string first_name;
+        public string last_name;
+        public int sex;
+        public string photo_200;
+        public VKCityData city;
+        public VKCountryData country;
+    }
+
+    [Serializable]
+    public class VKCityData
+    {
+        public int id;
+        public string title;
+    }
+
+    [Serializable]
+    public class VKCountryData
+    {
+        public int id;
+        public string title;
     }
 
     public class VkPromiseError

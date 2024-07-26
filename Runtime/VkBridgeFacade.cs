@@ -150,11 +150,11 @@ namespace VKBridgeSDK.Runtime
                 banner_orientation = Enum.GetName(typeof(BannerOrientation), orientation),
                 banner_layout = Enum.GetName(typeof(BannerLayout), layout)
             };
-                
+
             var vkPromise = await _vkResponseManager.CallVkMethodAsync("VKWebAppShowBannerAd", parameters);
             return vkPromise.data.result;
         }
-        
+
         public static async UniTask<bool> HideBannerAd()
         {
             var vkPromise = await _vkResponseManager.CallVkMethodAsync("VKWebAppHideBannerAd");
@@ -183,6 +183,69 @@ namespace VKBridgeSDK.Runtime
 
             return vkPromise.data.result;
         }
+
+        public static async UniTask<bool> PublishPostOnWall(string postMessage,
+            string postAttachments,
+            bool friendsOnly)
+        {
+            var methodParameters = new
+                { message = postMessage, attachments = postAttachments, friends_only = friendsOnly };
+
+            var vkPromise = await _vkResponseManager.CallVkMethodAsync("VKWebAppShowWallPostBox", methodParameters);
+            return vkPromise.data.result;
+        }
+
+        /// <summary>
+        /// Открывает окно покупки виртуальной ценности в мини-приложении или игре.
+        /// </summary>
+        /// <param name="itemType">Тип виртуальной ценности. Всегда имеет значение item.</param>
+        /// <param name="itemId">Название виртуальной ценности. Будет передано в уведомлении на получение информации о виртуальной ценности. Длина строки: 64 символа.</param>
+        /// <returns></returns>
+        public static async UniTask<bool> ShowOrderBox(string itemType, string itemId)
+        {
+            var methodParameters = new {type = itemType, item = itemId};
+
+            var vkPromise = await _vkResponseManager.CallVkMethodAsync("VKWebAppShowOrderBox", methodParameters);
+            return vkPromise.data.success;
+        }
+
+        public enum SubscriptionAction
+        {
+            create,
+            cancel,
+            resume
+            
+        }
+
+        public static async UniTask<bool> ShowSubscriptionBox(SubscriptionAction action, string item, string subscriptionId)
+        {
+            var methodParameters = new
+            {
+                action = Enum.GetName(typeof(SubscriptionAction), action),
+                item = item,
+                subscription_id = subscriptionId
+            };
+
+            var vkPromise = await _vkResponseManager.CallVkMethodAsync("VKWebAppShowSubscriptionBox", methodParameters);
+            return vkPromise.data.success;
+        }
+
+        /// <summary>
+        /// Показывает окно выбора друзей из списка и получает информацию о них.
+        /// </summary>
+        /// <param name="isMultiSelect">Информация о том, выбрать ли нескольких друзей из списка или одного. </param>
+        /// <returns></returns>
+        public static async UniTask<bool> GetFriendsList(bool isMultiSelect)
+        {
+            var methodParameters = new
+            {
+                multi = isMultiSelect
+            };
+
+            var vkPromise = await _vkResponseManager.CallVkMethodAsync("VKWebAppGetFriends", methodParameters);
+            return vkPromise.data.success;
+        }
+        
 
         public static void ShowAlert(string message)
         {
