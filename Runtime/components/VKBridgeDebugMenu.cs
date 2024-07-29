@@ -35,18 +35,25 @@ namespace VKBridgeSDK.Runtime.components
 
         private Vector2 scrollPosition = Vector2.zero;
 
+        
         private void DrawDebugMenu()
         {
-            var menuWidth = 200f;
-            var menuHeight = 300f;
-            var menuX = (Screen.width - menuWidth) / 2f;
-            var menuY = (Screen.height - menuHeight) / 2f;
+            const float MENU_WIDTH = 250f;
+            const float MENU_HEIGHT = 600;
+            
+            var menuX = (Screen.width - MENU_WIDTH) / 2f;
+            var menuY = (Screen.height - MENU_HEIGHT) / 2f;
 
-            GUILayout.BeginArea(new Rect(menuX, menuY, menuWidth, menuHeight), "VK Debug Menu", GUI.skin.window);
+            GUILayout.BeginArea(new Rect(menuX, menuY, MENU_WIDTH + 10, MENU_HEIGHT), "VK Debug Menu", GUI.skin.window);
 
-            scrollPosition = GUILayout.BeginScrollView(scrollPosition, GUILayout.Width(menuWidth),
-                GUILayout.Height(menuHeight));
+            scrollPosition = GUILayout.BeginScrollView(scrollPosition, GUILayout.Width(MENU_WIDTH - 10),
+                GUILayout.Height(MENU_HEIGHT));
 
+            if (GUILayout.Button("Switch old and new systems"))
+            {
+                SwitchNewAndOld();
+            }
+            
             if (GUILayout.Button("Test alert"))
             {
                 TestAlert();
@@ -110,6 +117,28 @@ namespace VKBridgeSDK.Runtime.components
                 CheckNativeRewardAd().Forget();
             }
 
+            if (GUILayout.Button("Get Friends List"))
+            {
+                GetFriendsList().Forget();
+            }
+
+            if (GUILayout.Button("Publish post"))
+            {
+                PublishPostOnWall().Forget();
+            }
+            
+            //GetUserData();
+            if (GUILayout.Button("Get user data"))
+            {
+                GetUserData().Forget();
+            }
+            
+            //ShowOrderBox();
+            if (GUILayout.Button("Show Order Box"))
+            {
+                ShowOrderBox().Forget();
+            }
+            
             // End the scroll view
             GUILayout.EndScrollView();
             GUILayout.EndArea();
@@ -257,7 +286,7 @@ namespace VKBridgeSDK.Runtime.components
             }
         }
 
-        private async UniTaskVoid PublishPostOnWall()
+        private async UniTaskVoid PublishPostOnWall()//TODO Missing require param
         {
             try
             {
@@ -269,6 +298,55 @@ namespace VKBridgeSDK.Runtime.components
                 Debug.LogError(e);
                 throw;
             }
+        }
+        
+        private async UniTaskVoid GetFriendsList()
+        {
+            try
+            {
+                var friends = await VkBridgeFacade.GetFriendList(true);
+                foreach (var friend in friends.users)
+                {
+                    Debug.Log($"FriendFirstName: {friend.first_name}, LastName: {friend.last_name}, ID: {friend.id}");
+                }
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+        }
+        
+        private async UniTaskVoid GetUserData()
+        {
+            try
+            {
+                var userData= await VkBridgeFacade.GetUserData();
+                Debug.Log(userData);
+            }
+            catch (Exception e)
+            {
+                Debug.LogError(e);
+            }
+        }
+
+        private async UniTaskVoid ShowOrderBox()
+        {
+            try
+            {
+                var orderId = await VkBridgeFacade.ShowOrderBox("Товар 1", "100 рублей");//TODO incorrect params
+                Debug.Log($"Order ID: {orderId}");
+            }
+            catch (Exception e)
+            {
+                Debug.LogError(e);
+                throw;
+            }
+        }
+
+
+        public void SwitchNewAndOld()
+        {
+            VkBridgeFacade.UseOld = !VkBridgeFacade.UseOld;
         }
     }
 }

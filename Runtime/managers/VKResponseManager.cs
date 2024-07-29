@@ -21,6 +21,8 @@ namespace VKBridgeSDK.Runtime.managers
         [DllImport("__Internal")]
         private static extern void UnityVKBridge_SetupFocusHandlers();
 
+        public bool useold = true;
+
         public VKResponseManager()
         {
             SetupFocusHandlers();
@@ -34,7 +36,7 @@ namespace VKBridgeSDK.Runtime.managers
             }
         }
 
-
+        [Obsolete]
         public async UniTask<VKPromise> CallVkMethodAsync(string methodName, params object[] parameters)
         {
             var taskCompletionSource = new UniTaskCompletionSource<VKPromise>();
@@ -56,7 +58,7 @@ namespace VKBridgeSDK.Runtime.managers
                     new VKPromise
                     {
                         method = methodName,
-                        data = new VKPromiseData
+                        data = new VKPromiseDataOLD
                         {
                             result = true
                         }
@@ -68,10 +70,51 @@ namespace VKBridgeSDK.Runtime.managers
 
 
             return await taskCompletionSource.Task;
+            
+        }
+
+        public async UniTask<T> CallVkMethodAsync<T>(string methodName, params object[] parameters) where T : VKData
+        {
+            var vkPromise = new VKPromise<T>();
+            _promises[methodName] = vkPromise;
+            
+            var paramsString = parameters.Length > 0
+                ? Newtonsoft.Json.JsonConvert.SerializeObject(parameters)
+                : string.Empty;
+            
+            if (!Application.isEditor)
+            {
+                UnityVKBridge_SendMessage(methodName, paramsString);
+            }
+            else
+            {
+                UniTask.Delay(300);
+                var defaultInstance = Activator.CreateInstance<T>();
+                vkPromise.CompletionSource.TrySetResult(defaultInstance);
+                Debug.Log($"VKBridge.send<T>({methodName}, {paramsString}) called");
+            }
+            
+            return await vkPromise.CompletionSource.Task;
+        }
+
+        private readonly Dictionary<string, IVKPromise> _promises = new Dictionary<string, IVKPromise>();
+
+        public void HandlePromiseResponse(string jsonData)
+        {
+            if (useold)
+            {
+                HandlePromiseResponseOld(jsonData);
+                
+            }
+            else
+            {
+                HandlePromiseResponseNew(jsonData);
+            }
         }
 
 
-        public void HandlePromiseResponse(string jsonData)
+        [Obsolete]
+        public void HandlePromiseResponseOld(string jsonData)
         {
             var response = JsonUtility.FromJson<VKPromise>(jsonData);
 
@@ -81,21 +124,57 @@ namespace VKBridgeSDK.Runtime.managers
                 return;
 
             tcs.TrySetResult(response);
+            
             _promiseTasks.Remove(response.method);
         }
+        public void HandlePromiseResponseNew(string jsonResponse)
+        {
+            var response = JsonUtility.FromJson<VKPromiseResponse>(jsonResponse);
+            if (_promises.TryGetValue(response.method, out var promise))
+            {
+                promise.SetResult(response.data);
+                _promises.Remove(response.method);
+            }
+        }
 
-        public void HandleErrorResponse(string jsonData)
+        public void HandleErrorResponseNew(string jsonData)
+        {
+            var response = JsonUtility.FromJson<VKPromiseResponse>(jsonData);
+            
+            if (_promises.TryGetValue(response.method, out var promise))
+            {
+                promise.SetException(response.data);
+                _promises.Remove(response.method);
+            }
+        }
+
+        [Obsolete]
+        public void HandleErrorResponseOld(string jsonData)
         {
             var response = JsonUtility.FromJson<VkPromiseError>(jsonData);
+            
             if (!_promiseTasks.TryGetValue(response.method, out var tcs))
                 return;
 
+            
             var data = response.error.data.error_data;
             var errorMessage = !string.IsNullOrEmpty(data.error_description) ? data.error_description :
                 !string.IsNullOrEmpty(data.error_msg) ? data.error_msg : data.error_reason;
 
             tcs.TrySetException(new Exception(errorMessage));
             _promiseTasks.Remove(response.method);
+        }
+        
+        public void HandleErrorResponse(string jsonData)
+        {
+            if (useold)
+            {
+                HandleErrorResponseOld(jsonData);
+            }
+            else
+            {
+                HandleErrorResponseNew(jsonData);
+            }
         }
 
         public void ShowAlert(string message)

@@ -8,8 +8,8 @@ namespace VKBridgeSDK.Runtime.managers
 {
     public class VKEventManager
     {
-        private readonly Dictionary<VKBridgeEventType, Action<VKPromiseData>> _eventListeners =
-            new Dictionary<VKBridgeEventType, Action<VKPromiseData>>();
+        private readonly Dictionary<VKBridgeEventType, Action<VKPromiseDataOLD>> _eventListeners =
+            new Dictionary<VKBridgeEventType, Action<VKPromiseDataOLD>>();
 
         [DllImport("__Internal")]
         private static extern void UnityVKBridge_Subscribe();
@@ -27,7 +27,7 @@ namespace VKBridgeSDK.Runtime.managers
             }
         }
 
-        public void AddEventListener(VKBridgeEventType eventType, Action<VKPromiseData> listener)
+        public void AddEventListener(VKBridgeEventType eventType, Action<VKPromiseDataOLD> listener)
         {
             if (!_eventListeners.ContainsKey(eventType))
             {
@@ -39,7 +39,7 @@ namespace VKBridgeSDK.Runtime.managers
             }
         }
 
-        public void RemoveEventListener(VKBridgeEventType eventType, Action<VKPromiseData> listener)
+        public void RemoveEventListener(VKBridgeEventType eventType, Action<VKPromiseDataOLD> listener)
         {
             if (!_eventListeners.ContainsKey(eventType))
                 return;
@@ -51,7 +51,7 @@ namespace VKBridgeSDK.Runtime.managers
             }
         }
 
-        public void TriggerEvent(VKBridgeEventType eventType, VKPromiseData vkPromiseData)
+        public void TriggerEvent(VKBridgeEventType eventType, VKPromiseDataOLD vkPromiseData)
         {
             if (_eventListeners.TryGetValue(eventType, out var listener)) listener?.Invoke(vkPromiseData);
         }

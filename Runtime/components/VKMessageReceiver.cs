@@ -43,14 +43,14 @@ namespace VKBridgeSDK.Runtime.components
         public void OnFocus()
         {
             Debug.Log("Browser window gained focus");
-            _eventManager.TriggerEvent(VKBridgeEventType.FocusChanged, new VKPromiseData { result = true });
+            _eventManager.TriggerEvent(VKBridgeEventType.FocusChanged, new VKPromiseDataOLD { result = true });
         }
 
         [UsedImplicitly]
         public void OnBlur()
         {
             Debug.Log("Browser window lost focus");
-            _eventManager.TriggerEvent(VKBridgeEventType.FocusChanged, new VKPromiseData { result = false });
+            _eventManager.TriggerEvent(VKBridgeEventType.FocusChanged, new VKPromiseDataOLD { result = false });
         }
     }
 }
