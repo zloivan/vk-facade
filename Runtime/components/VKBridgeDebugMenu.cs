@@ -49,11 +49,6 @@ namespace VKBridgeSDK.Runtime.components
             scrollPosition = GUILayout.BeginScrollView(scrollPosition, GUILayout.Width(MENU_WIDTH - 10),
                 GUILayout.Height(MENU_HEIGHT));
 
-            if (GUILayout.Button("Switch old and new systems"))
-            {
-                SwitchNewAndOld();
-            }
-            
             if (GUILayout.Button("Test alert"))
             {
                 TestAlert();
@@ -343,10 +338,5 @@ namespace VKBridgeSDK.Runtime.components
             }
         }
 
-
-        public void SwitchNewAndOld()
-        {
-            VkBridgeFacade.UseOld = !VkBridgeFacade.UseOld;
-        }
     }
 }

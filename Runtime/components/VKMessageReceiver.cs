@@ -35,7 +35,7 @@ namespace VKBridgeSDK.Runtime.components
             var eventObject = JsonUtility.FromJson<VKEvent>(jsonData);
             if (Enum.TryParse(eventObject.detail.type, out VKBridgeEventType eventType))
             {
-                _eventManager.TriggerEvent(eventType, eventObject.detail._vkPromiseData);
+                _eventManager.TriggerEvent(eventType, eventObject.detail.data);
             }
         }
 
@@ -43,14 +43,14 @@ namespace VKBridgeSDK.Runtime.components
         public void OnFocus()
         {
             Debug.Log("Browser window gained focus");
-            _eventManager.TriggerEvent(VKBridgeEventType.FocusChanged, new VKPromiseDataOLD { result = true });
+            _eventManager.TriggerEvent(VKBridgeEventType.FocusChanged, new VKEventData { result = true });
         }
 
         [UsedImplicitly]
         public void OnBlur()
         {
             Debug.Log("Browser window lost focus");
-            _eventManager.TriggerEvent(VKBridgeEventType.FocusChanged, new VKPromiseDataOLD { result = false });
+            _eventManager.TriggerEvent(VKBridgeEventType.FocusChanged, new VKEventData { result = false });
         }
     }
 }

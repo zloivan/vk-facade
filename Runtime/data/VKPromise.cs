@@ -1,55 +1,12 @@
 using System;
-using Cysharp.Threading.Tasks;
-using UnityEngine;
 
 namespace VKBridgeSDK.Runtime.data
 {
-    [Serializable]
-    public class VKPromise
-    {
-        public string method;
-        public VKPromiseDataOLD data;
-
-        public override string ToString()
-        {
-            return $"{nameof(method)}: {method}, {nameof(data)}: {data}";
-        }
-    }
-
     public class VKPromiseResponse
     {
         public string method;
         public string data;
     }
-
-    public class VKPromise<T> : IVKPromise where T : VKData
-    {
-        public UniTaskCompletionSource<T> CompletionSource { get; set; } = new UniTaskCompletionSource<T>();
-
-        public void SetResult(string jsonData)
-        {
-            var data = JsonUtility.FromJson<T>(jsonData);
-            CompletionSource.TrySetResult(data);
-        }
-        
-        public void SetException(string jsonExceptionData)
-        {
-            var error = JsonUtility.FromJson<VKError>(jsonExceptionData);
-            
-            var data = error.data.error_data;
-            var errorMessage = !string.IsNullOrEmpty(data.error_description) ? data.error_description :
-                !string.IsNullOrEmpty(data.error_msg) ? data.error_msg : data.error_reason;
-            
-            CompletionSource.TrySetException(new Exception(errorMessage));
-        }
-    }
-
-    public interface IVKPromise
-    {
-        void SetResult(string jsonData);
-        void SetException(string jsonExceptionData);
-    }
-
 
     public abstract class VKData
     {
@@ -60,25 +17,26 @@ namespace VKBridgeSDK.Runtime.data
     {
         public bool result;
     }
-    
+
     [Serializable]
     public class VKOrderData : VKData
     {
         public bool success;
     }
+
     [Serializable]
     public class VKSubscriptionData : VKData
     {
         public bool success;
         public int subscriptionId;
     }
-    
+
     [Serializable]
-    public class VKFriendsData : VKData// Ето не я ебанутый, это в вк так сделали
+    public class VKFriendsData : VKData // Ето не я ебанутый, это в вк так сделали
     {
         public VKUserData[] users;
     }
-    
+
     [Serializable]
     public class VKUsersData : VKData // Ето не я ебанутый, это в вк так сделали
     {
@@ -95,11 +53,11 @@ namespace VKBridgeSDK.Runtime.data
     public class Detail
     {
         public string type;
-        public VKPromiseDataOLD _vkPromiseData;
+        public VKEventData data;
     }
 
-    [Serializable][Obsolete]
-    public class VKPromiseDataOLD : VKData
+    [Serializable]
+    public class VKEventData : VKData
     {
         public bool result;
         public string reason;
@@ -114,7 +72,7 @@ namespace VKBridgeSDK.Runtime.data
         public string requestKey;
         public int post_id;
         public VKUserData[] users;
-        
+
 
         public override string ToString()
         {
@@ -133,10 +91,11 @@ namespace VKBridgeSDK.Runtime.data
         public string photo_200;
         public VKCityData city;
         public VKCountryData country;
-        
+
         public override string ToString()
         {
-            return $"{nameof(id)}: {id}, {nameof(first_name)}: {first_name}, {nameof(last_name)}: {last_name}, {nameof(sex)}: {sex}, {nameof(photo_200)}: {photo_200}, {nameof(city)}: {city}, {nameof(country)}: {country}";
+            return
+                $"{nameof(id)}: {id}, {nameof(first_name)}: {first_name}, {nameof(last_name)}: {last_name}, {nameof(sex)}: {sex}, {nameof(photo_200)}: {photo_200}, {nameof(city)}: {city}, {nameof(country)}: {country}";
         }
     }
 
@@ -145,7 +104,7 @@ namespace VKBridgeSDK.Runtime.data
     {
         public int id;
         public string title;
-        
+
         public override string ToString()
         {
             return $"{nameof(id)}: {id}, {nameof(title)}: {title}";
@@ -157,18 +116,11 @@ namespace VKBridgeSDK.Runtime.data
     {
         public int id;
         public string title;
-        
+
         public override string ToString()
         {
             return $"{nameof(id)}: {id}, {nameof(title)}: {title}";
         }
-    }
-
-    [Obsolete]
-    public class VkPromiseError
-    {
-        public string method;
-        public VKError error;
     }
 
     [Serializable]
@@ -194,5 +146,37 @@ namespace VKBridgeSDK.Runtime.data
             public string error_msg;
             public int error;
         }
+    }
+
+    public enum BannerLocation
+    {
+        bottom,
+        top
+    }
+
+    public enum BannerAlign
+    {
+        left,
+        right,
+        center
+    }
+
+    public enum BannerLayout
+    {
+        resize,
+        overlay
+    }
+
+    public enum BannerOrientation
+    {
+        vertical,
+        horizontal
+    }
+
+    public enum SubscriptionAction
+    {
+        create,
+        cancel,
+        resume
     }
 }

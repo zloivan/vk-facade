@@ -1,6 +1,6 @@
 namespace VKBridgeSDK.Runtime.data
 {
-    public enum VKBridgeEventType
+    public enum VKBridgeEventType // Имена инамов менять нельзя, они соответствуют именам ивентов в VK Bridge
     {
         Undefined,
         FocusChanged,
