@@ -73,15 +73,15 @@ namespace VKBridgeSDK.Runtime.managers
             
         }
 
-        public async UniTask<T> CallVkMethodAsync<T>(string methodName, params object[] parameters) where T : VKData
+        public async UniTask<T> CallVkMethodAsync<T>(string methodName, object parameters = null) where T : VKData
         {
             var vkPromise = new VKPromise<T>();
             _promises[methodName] = vkPromise;
-            
-            var paramsString = parameters.Length > 0
+
+            var paramsString = parameters != null
                 ? Newtonsoft.Json.JsonConvert.SerializeObject(parameters)
                 : string.Empty;
-            
+
             if (!Application.isEditor)
             {
                 UnityVKBridge_SendMessage(methodName, paramsString);
@@ -93,7 +93,7 @@ namespace VKBridgeSDK.Runtime.managers
                 vkPromise.CompletionSource.TrySetResult(defaultInstance);
                 Debug.Log($"VKBridge.send<T>({methodName}, {paramsString}) called");
             }
-            
+
             return await vkPromise.CompletionSource.Task;
         }
 
