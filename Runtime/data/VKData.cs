@@ -2,12 +2,6 @@ using System;
 
 namespace VKBridgeSDK.Runtime.data
 {
-    public class VKPromiseResponse
-    {
-        public string method;
-        public string data;
-    }
-
     public abstract class VKData
     {
     }
@@ -16,12 +10,22 @@ namespace VKBridgeSDK.Runtime.data
     public class VKRequestData : VKData
     {
         public bool result;
+
+        public override string ToString()
+        {
+            return $"{nameof(result)}: {result}";
+        }
     }
 
     [Serializable]
     public class VKOrderData : VKData
     {
         public bool success;
+
+        public override string ToString()
+        {
+            return $"{nameof(success)}: {success}";
+        }
     }
 
     [Serializable]
@@ -29,12 +33,22 @@ namespace VKBridgeSDK.Runtime.data
     {
         public bool success;
         public int subscriptionId;
+
+        public override string ToString()
+        {
+            return $"{nameof(success)}: {success}, {nameof(subscriptionId)}: {subscriptionId}";
+        }
     }
 
     [Serializable]
     public class VKFriendsData : VKData // Ето не я ебанутый, это в вк так сделали
     {
         public VKUserData[] users;
+
+        public override string ToString()
+        {
+            return $"{nameof(users)}: {users}";
+        }
     }
 
     [Serializable]
@@ -44,16 +58,26 @@ namespace VKBridgeSDK.Runtime.data
     }
 
     [Serializable]
-    public class VKEvent
+    public class VKEvent : VKData
     {
         public Detail detail;
+
+        public override string ToString()
+        {
+            return $"{nameof(detail)}: {detail}";
+        }
     }
 
     [Serializable]
-    public class Detail
+    public class Detail : VKData
     {
         public string type;
         public VKEventData data;
+
+        public override string ToString()
+        {
+            return $"{nameof(type)}: {type}, {nameof(data)}: {data}";
+        }
     }
 
     [Serializable]
@@ -70,14 +94,19 @@ namespace VKBridgeSDK.Runtime.data
         public bool success;
         public string[] notSentIds;
         public string requestKey;
+        public string app_id;
+        public string api_host;
         public int post_id;
+
+        public string error_type;
+        public VKError.ErrorData error_data;
         public VKUserData[] users;
 
 
         public override string ToString()
         {
             return
-                $"{nameof(result)}: {result}, {nameof(reason)}: {reason}, {nameof(banner_width)}: {banner_width}, {nameof(banner_height)}: {banner_height}, {nameof(banner_location)}: {banner_location}, {nameof(banner_align)}: {banner_align}, {nameof(orientation)}: {orientation}, {nameof(layout_type)}: {layout_type}, {nameof(success)}: {success}, {nameof(notSentIds)}: {notSentIds}, {nameof(requestKey)}: {requestKey}";
+                $"{nameof(result)}: {result}, {nameof(reason)}: {reason}, {nameof(banner_width)}: {banner_width}, {nameof(banner_height)}: {banner_height}, {nameof(banner_location)}: {banner_location}, {nameof(banner_align)}: {banner_align}, {nameof(orientation)}: {orientation}, {nameof(layout_type)}: {layout_type}, {nameof(success)}: {success}, {nameof(notSentIds)}: {notSentIds}, {nameof(requestKey)}: {requestKey}, {nameof(app_id)}: {app_id}, {nameof(api_host)}: {api_host}, {nameof(post_id)}: {post_id}, {nameof(error_type)}: {error_type}, {nameof(error_data)}: {error_data}, {nameof(users)}: {users}";
         }
     }
 
@@ -100,7 +129,7 @@ namespace VKBridgeSDK.Runtime.data
     }
 
     [Serializable]
-    public class VKCityData
+    public class VKCityData : VKData
     {
         public int id;
         public string title;
@@ -112,7 +141,7 @@ namespace VKBridgeSDK.Runtime.data
     }
 
     [Serializable]
-    public class VKCountryData
+    public class VKCountryData : VKData
     {
         public int id;
         public string title;
@@ -124,17 +153,28 @@ namespace VKBridgeSDK.Runtime.data
     }
 
     [Serializable]
-    public class VKError
+    public class VKError : VKData
     {
         public string type;
         public Data data;
 
+        public override string ToString()
+        {
+            return $"{nameof(type)}: {type}, {nameof(data)}: {data}";
+        }
+        
         [Serializable]
         public class Data
         {
             public string error_type;
             public ErrorData error_data;
             public int request_id;
+
+            public override string ToString()
+            {
+                return
+                    $"{nameof(error_type)}: {error_type}, {nameof(error_data)}: {error_data}, {nameof(request_id)}: {request_id}";
+            }
         }
 
         [Serializable]
@@ -145,6 +185,12 @@ namespace VKBridgeSDK.Runtime.data
             public string error_description;
             public string error_msg;
             public int error;
+
+            public override string ToString()
+            {
+                return
+                    $"{nameof(error_code)}: {error_code}, {nameof(error_reason)}: {error_reason}, {nameof(error_description)}: {error_description}, {nameof(error_msg)}: {error_msg}, {nameof(error)}: {error}";
+            }
         }
     }
 

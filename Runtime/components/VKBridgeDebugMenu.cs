@@ -285,8 +285,9 @@ namespace VKBridgeSDK.Runtime.components
         {
             try
             {
-                if (await VkBridgeFacade.PublishPostOnWall("Побьете мой рекорд?", "https://vk.com/app52010090", true))
-                    Debug.Log("Post was published on wall");
+                await VkBridgeFacade.PublishPostOnWall($"Думаете, вы лучше меня? Попробуйте побить мой рекорд: " +
+                                                           $"{1500}?! \nЖду вас здесь: ",
+                        $"https://vk.com/app52010090");
             }
             catch (Exception e)
             {

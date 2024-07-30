@@ -1,10 +1,12 @@
 using System;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
+using FloorIsLava.VKBridgeSDK.helpers;
 using UnityEngine;
 using VKBridgeSDK.Runtime.components;
 using VKBridgeSDK.Runtime.data;
 using VKBridgeSDK.Runtime.managers;
+using ILogger = FloorIsLava.VKBridgeSDK.helpers.ILogger;
 using Object = UnityEngine.Object;
 
 namespace VKBridgeSDK.Runtime
@@ -15,42 +17,52 @@ namespace VKBridgeSDK.Runtime
     /// </summary>
     public static class VkBridgeFacade
     {
-        
-
         private static VKResponseManager _vkResponseManager;
-
         private static VKEventManager _eventManager;
-
         private static GameObject _messageReceiverObject;
-
+        private static GameObject _vKMenuGameobject;
         private static VKMessageReceiver _vkMessageReceiver;
-
-        public const bool IsDebug = true;
+        private static ILogger _logger = new VKBridgeLogger();
 
         public static void Initialize()
         {
+            _logger.Log("Initializing VkBridgeFacade...");
             _vkResponseManager = new VKResponseManager();
             _eventManager = new VKEventManager();
-
+            _logger.Log("Initializing VkBridgeFacade...");
             _messageReceiverObject = new GameObject("VKMessageReceiver");
             _vkMessageReceiver = _messageReceiverObject.AddComponent<VKMessageReceiver>();
             _vkMessageReceiver.Initialize(_vkResponseManager, _eventManager);
 
             Object.DontDestroyOnLoad(_messageReceiverObject);
 
-            if (IsDebug)
-            {
-                SpawnDebugMenu();
-            }
+            SpawnDebugMenu();
         }
 
         private static void SpawnDebugMenu()
         {
-            var go = new GameObject("VKDebugMenu");
-            go.AddComponent<VKBridgeDebugMenu>();
-            Object.DontDestroyOnLoad(go);
+            _vKMenuGameobject = new GameObject("VKDebugMenu");
+            _vKMenuGameobject.AddComponent<VKBridgeDebugMenu>();
+            Object.DontDestroyOnLoad(_vKMenuGameobject);
+            _vKMenuGameobject.SetActive(false);
         }
 
+
+        /// <summary>
+        /// Call custom request to VKBridge
+        /// </summary>
+        /// <param name="methodName">Method name of VKBridge sdk </param>
+        /// <param name="parameters">This is must be object type, follow strictly to VkBridge documentaion and params that are descirbed there for each method. Check parsing is correct</param>
+        /// <typeparam name="T">Pick the child of VkData that is applicable to method call</typeparam>
+        /// <returns></returns>
+        /// /// <remarks>
+        /// To learn more about how to use this method, please refer to the <a href="https://dev.vk.com/ru/bridge/overview">VKBridge Documentation</a>.
+        /// </remarks>
+        public static async UniTask<T> CallCustomRequest<T>(string methodName, object parameters) where T : VKData
+        {
+            return await _vkResponseManager.CallVkMethodAsync<T>(methodName, parameters);
+        }
+        
         public static async UniTask<VKRequestData> CallAPIMethod(string methodName, string parameters)
         {
             return await _vkResponseManager.CallVkMethodAsync<VKRequestData>("VKWebAppCallAPIMethod",
@@ -83,6 +95,7 @@ namespace VKBridgeSDK.Runtime
                 use_waterfall = useWaterfall
             });
 
+            _logger.Log($"CheckNativeInterstitialAd got result: {vkPromise.result}");
             return vkPromise.result;
         }
 
@@ -93,7 +106,9 @@ namespace VKBridgeSDK.Runtime
                 ad_format = "reward",
                 use_waterfall = useWaterfall
             });
-
+            
+            _logger.Log($"CheckNativeRewardAd got result: {vkPromise.result}");
+            _logger.Log($"CheckNativeRewardAd got vkPromise: {vkPromise}");
             return vkPromise.result;
         }
 
@@ -104,7 +119,8 @@ namespace VKBridgeSDK.Runtime
                 ad_format = "reward",
                 use_waterfall = useWaterfall
             });
-
+            
+            _logger.Log($"ShowNativeRewardAd got result: {vkPromise.result}");
             return vkPromise.result;
         }
 
@@ -116,6 +132,7 @@ namespace VKBridgeSDK.Runtime
                 use_waterfall = useWaterfall
             });
 
+            _logger.Log($"ShowNativeInterstitialAd got result: {vkPromise.result}");
             return vkPromise.result;
         }
 
@@ -134,12 +151,16 @@ namespace VKBridgeSDK.Runtime
 
             var vkPromise =
                 await _vkResponseManager.CallVkMethodAsync<VKRequestData>("VKWebAppShowBannerAd", parameters);
+            
+            _logger.Log($"ShowBannerAd got result: {vkPromise.result}");
             return vkPromise.result;
         }
 
         public static async UniTask<bool> HideBannerAd()
         {
             var vkData = await _vkResponseManager.CallVkMethodAsync<VKRequestData>("VKWebAppHideBannerAd");
+            
+            _logger.Log($"HideBannerAd got result: {vkData.result}");
             return vkData.result;
         }
 
@@ -147,12 +168,16 @@ namespace VKBridgeSDK.Runtime
         public static async UniTask<bool> CheckBannerAd()
         {
             var vkData = await _vkResponseManager.CallVkMethodAsync<VKRequestData>("VKWebAppCheckBannerAd");
+            
+            _logger.Log($"CheckBannerAd got result: {vkData.result}");
             return vkData.result;
         }
 
         public static async UniTask<bool> RecommendApp()
         {
             var vkData = await _vkResponseManager.CallVkMethodAsync<VKRequestData>("VKWebAppRecommend");
+            
+            _logger.Log($"RecommendApp got result: {vkData.result}");
             return vkData.result;
         }
 
@@ -166,6 +191,7 @@ namespace VKBridgeSDK.Runtime
                 await _vkResponseManager.CallVkMethodAsync<VKRequestData>("VKWebAppShowLeaderBoardBox",
                     methodParameters);
 
+            _logger.Log($"ShowLeaderBoard got result: {vkPromise.result}");
             return vkPromise.result;
         }
 
@@ -188,6 +214,8 @@ namespace VKBridgeSDK.Runtime
 
             var vkPromise =
                 await _vkResponseManager.CallVkMethodAsync<VKRequestData>("VKWebAppShowWallPostBox", methodParameters);
+            
+            _logger.Log($"ShowPostOnWall got result: {vkPromise.result}");
             return vkPromise.result;
         }
 
@@ -203,6 +231,8 @@ namespace VKBridgeSDK.Runtime
 
             var vkPromise =
                 await _vkResponseManager.CallVkMethodAsync<VKOrderData>("VKWebAppShowOrderBox", methodParameters);
+            
+            _logger.Log($"ShowOrderBox got result: {vkPromise.success}");
             return vkPromise.success;
         }
 
@@ -220,6 +250,8 @@ namespace VKBridgeSDK.Runtime
             var vkData =
                 await _vkResponseManager.CallVkMethodAsync<VKSubscriptionData>("VKWebAppShowSubscriptionBox",
                     methodParameters);
+            
+            _logger.Log($"ShowSubscriptionBox got result: {vkData}");
             return vkData;
         }
 
@@ -237,6 +269,8 @@ namespace VKBridgeSDK.Runtime
 
             var vkData =
                 await _vkResponseManager.CallVkMethodAsync<VKFriendsData>("VKWebAppGetFriends", methodParameters);
+            
+            _logger.Log($"GetFriendList got result: {vkData}");
             return vkData;
         }
 
@@ -252,6 +286,7 @@ namespace VKBridgeSDK.Runtime
             var vkData =
                 await _vkResponseManager.CallVkMethodAsync<VKUserData>("VKWebAppGetUserInfo", methodParameters);
 
+            _logger.Log($"GetUserData got result: {vkData}");
             return vkData;
         }
 
@@ -267,6 +302,7 @@ namespace VKBridgeSDK.Runtime
             var vkData =
                 await _vkResponseManager.CallVkMethodAsync<VKUsersData>("VKWebAppGetUserInfo", methodParameters);
 
+            _logger.Log($"GetUsersData got result: {vkData}");
             return vkData;
         }
 
@@ -277,14 +313,17 @@ namespace VKBridgeSDK.Runtime
 
         public static void AddEventListener(VKBridgeEventType eventType, Action<VKEventData> listener)
         {
-            _eventManager.AddEventListener(eventType, listener);
+            _eventManager?.AddEventListener(eventType, listener);
         }
 
         public static void RemoveEventListener(VKBridgeEventType eventType, Action<VKEventData> listener)
         {
-            _eventManager.RemoveEventListener(eventType, listener);
+            _eventManager?.RemoveEventListener(eventType, listener);
         }
 
+        /// <summary>
+        /// Used to reset static fields in Editor
+        /// </summary>
         public static void Reset()
         {
             if (_messageReceiverObject != null)
@@ -292,10 +331,25 @@ namespace VKBridgeSDK.Runtime
                 Object.Destroy(_messageReceiverObject);
             }
 
+            if (_vKMenuGameobject != null)
+            {
+                Object.Destroy(_vKMenuGameobject);
+            }
+
+            _vKMenuGameobject = null;
             _vkResponseManager = null;
             _eventManager = null;
             _messageReceiverObject = null;
             _vkMessageReceiver = null;
+            _logger = null;
+        }
+
+        /// <summary>
+        /// Method enable debug menu
+        /// </summary>
+        public static void ShowDebug()
+        {
+            _vKMenuGameobject.SetActive(true);
         }
     }
 }

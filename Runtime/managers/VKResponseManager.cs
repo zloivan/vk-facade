@@ -2,15 +2,19 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using Cysharp.Threading.Tasks;
+using FloorIsLava.VKBridgeSDK.helpers;
+using Newtonsoft.Json;
 using UnityEngine;
 using VKBridgeSDK.Runtime.data;
+using ILogger = FloorIsLava.VKBridgeSDK.helpers.ILogger;
 
 namespace VKBridgeSDK.Runtime.managers
 {
     public class VKResponseManager
     {
         private readonly Dictionary<string, IVKPromise> _promises = new Dictionary<string, IVKPromise>();
-
+        private readonly ILogger _logger = new VKBridgeLogger();
+        
         [DllImport("__Internal")]
         private static extern void UnityVKBridge_SendMessage(string methodName, string parameters);
 
@@ -39,7 +43,7 @@ namespace VKBridgeSDK.Runtime.managers
             _promises[methodName] = vkPromise;
 
             var paramsString = parameters != null
-                ? Newtonsoft.Json.JsonConvert.SerializeObject(parameters)
+                ? JsonConvert.SerializeObject(parameters)
                 : string.Empty;
 
             if (!Application.isEditor)
@@ -51,30 +55,58 @@ namespace VKBridgeSDK.Runtime.managers
                 UniTask.Delay(300);
                 var defaultInstance = Activator.CreateInstance<T>();
                 vkPromise.CompletionSource.TrySetResult(defaultInstance);
-                Debug.Log($"VKBridge.send<T>({methodName}, {paramsString}) called");
+                _logger.Log($"VKBridge.send<T>({methodName}, {paramsString}) called");
             }
 
             return await vkPromise.CompletionSource.Task;
         }
 
-        public void HandlePromiseResponse(string jsonReponse)
+        public void HandlePromiseResponse(string jsonResponse)
         {
-            var response = JsonUtility.FromJson<VKPromiseResponse>(jsonReponse);
-            if (!_promises.TryGetValue(response.method, out var promise)) 
+            _logger.Log($"GOT RESPONSE FROM PROMISE JSON: {jsonResponse}");
+            VKPromiseResponse response;
+            try
+            {
+                response = JsonConvert.DeserializeObject<VKPromiseResponse>(jsonResponse);
+                _logger.Log($"Deserialized by newton RESPONSE FROM PROMISE data: {response.data}");
+                _logger.Log($"Deserialized by newton RESPONSE FROM PROMISE error: {response.error}");
+                _logger.Log($"Deserialized by newton RESPONSE FROM PROMISE error: {response.method}");
+            }
+            catch  (JsonReaderException ex)
+            {
+                _logger.LogError($"JsonReaderException: {ex.Message}");
+                throw;
+            }
+
+            if (!_promises.TryGetValue(response.method, out var promise))
                 return;
-            
-            promise.SetResult(response.data);
+
+            promise.SetResult(response.data?.ToString());
             _promises.Remove(response.method);
         }
 
-        public void HandleErrorResponse(string jsonData)
+        public void HandleErrorResponse(string jsonResponse)
         {
-            var response = JsonUtility.FromJson<VKPromiseResponse>(jsonData);
-
-            if (!_promises.TryGetValue(response.method, out var promise)) 
-                return;
             
-            promise.SetException(response.data);
+            _logger.Log($"GOT RESPONSE FROM PROMISE JSON: {jsonResponse}");
+            VKPromiseResponse response;
+            try
+            {
+                response = JsonConvert.DeserializeObject<VKPromiseResponse>(jsonResponse);
+                _logger.Log($"Deserialized by newton RESPONSE FROM PROMISE data: {response.data}");
+                _logger.Log($"Deserialized by newton RESPONSE FROM PROMISE error: {response.error}");
+                _logger.Log($"Deserialized by newton RESPONSE FROM PROMISE error: {response.method}");
+            }
+            catch (JsonReaderException exception)
+            {
+                _logger.LogError($"JsonReaderException: {exception.Message}");
+                throw;
+            }
+
+            if (!_promises.TryGetValue(response.method, out var promise))
+                return;
+
+            promise.SetException(response.error?.ToString());
             _promises.Remove(response.method);
         }
 
@@ -86,7 +118,7 @@ namespace VKBridgeSDK.Runtime.managers
             }
             else
             {
-                Debug.Log($"VKBridge.alert({message}) called");
+                _logger.Log($"VKBridge.alert({message}) called");
             }
         }
     }

@@ -21,11 +21,6 @@
         </div>
       </div>
       <div id="unity-warning"> </div>
-      <div id="unity-footer">
-<!--        <div id="unity-webgl-logo"></div>-->
-        <div id="unity-fullscreen-button"></div>
-        <div id="unity-build-title">{{{ PRODUCT_NAME }}}</div>
-      </div>
     </div>
     <script>
       var container = document.querySelector("#unity-container");
@@ -113,10 +108,6 @@
         {
           gameInstance = unityInstance;
           loadingBar.style.display = "none";
-          fullscreenButton.onclick = () => 
-          {
-            unityInstance.SetFullscreen(1);
-          };
         }).catch((message) => 
         {
           alert(message);
@@ -124,9 +115,6 @@
       };
       
       document.body.appendChild(script);
-
-      // // Инициализация VK Bridge
-      // vkBridge.send('VKWebAppInit');
     </script>
   </body>
 </html>

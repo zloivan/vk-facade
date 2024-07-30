@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
+using FloorIsLava.VKBridgeSDK.helpers;
 using UnityEngine;
 using VKBridgeSDK.Runtime.data;
+using ILogger = FloorIsLava.VKBridgeSDK.helpers.ILogger;
 
 namespace VKBridgeSDK.Runtime.managers
 {
@@ -11,6 +13,8 @@ namespace VKBridgeSDK.Runtime.managers
         private readonly Dictionary<VKBridgeEventType, Action<VKEventData>> _eventListeners =
             new Dictionary<VKBridgeEventType, Action<VKEventData>>();
 
+        private readonly ILogger _logger = new VKBridgeLogger();
+        
         [DllImport("__Internal")]
         private static extern void UnityVKBridge_Subscribe();
 
@@ -53,7 +57,10 @@ namespace VKBridgeSDK.Runtime.managers
 
         public void TriggerEvent(VKBridgeEventType eventType, VKEventData vkPromiseData)
         {
-            if (_eventListeners.TryGetValue(eventType, out var listener)) listener?.Invoke(vkPromiseData);
+            _logger.Log($"TriggerEvent called for {eventType}: [{vkPromiseData}]...");
+            
+            if (_eventListeners.TryGetValue(eventType, out var listener))
+                listener?.Invoke(vkPromiseData);
         }
     }
 }

@@ -1,0 +1,32 @@
+{
+  "name": "com.zloivan.vkbridgesdk",
+  "displayName": "IKhom VKBridge SDK",
+  "version": "1.0.0",
+  "unity": "2020.0",
+  "description": "Custom implementation of VKBridge SDK.",
+  "keywords": [
+    "vk",
+    "unity"
+  ],
+  "dependencies": {},
+  "repository": {
+    "url": "https://github.com/zloivan/vk-facade.git",
+    "type": "git",
+    "revision": "a24ffe4dfdbab263ebb31cbfc17c6e591bd6dfb2"
+  },
+  "_upm": {
+    "changelog": "- Initial version"},
+  "author": {
+    "name": "Ivan Khomichkov",
+    "url": "https://github.com/zloivan"
+  },
+  "readme": "https://github.com/zloivan/vk-facade/blob/master/README.md",
+  "license": "https://github.com/zloivan/vk-facade/blob/master/LICENSE.md",
+  "samples": [
+    {
+      "displayName": "VK WebGL Template",
+      "description": "WebGL Template, for publishing projects to VK social network",
+      "path": "Samples~/VKWebGLTemplate"
+    }
+  ]
+}
