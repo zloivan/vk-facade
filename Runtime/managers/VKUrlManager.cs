@@ -2,8 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using FloorIsLava.VKBridgeSDK.helpers;
+using UnityEngine;
 using UnityEngine.Assertions;
 using VKBridgeSDK.Runtime.data;
+using ILogger = FloorIsLava.VKBridgeSDK.helpers.ILogger;
 
 namespace VKBridgeSDK.Runtime.managers
 {
@@ -16,6 +18,9 @@ namespace VKBridgeSDK.Runtime.managers
 
         public VKLaunchParams GetLaunchParams()
         {
+            if (Application.isEditor)
+                return new VKLaunchParams();
+            
             _logger.Log("GetLaunchParams called...");
             var url = Marshal.PtrToStringAnsi(GetWindowLocationHref());
             Assert.IsNotNull(url, "URL, could not be null!");

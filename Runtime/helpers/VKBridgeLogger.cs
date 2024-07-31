@@ -28,13 +28,12 @@ namespace FloorIsLava.VKBridgeSDK.helpers
 #if WEBGL_VK_DEBUG
 _logsEnabled = true;
 #endif
-            
+            if (Application.isEditor == false)
+            {
+                UnityVKBridge_SetLogging(_logsEnabled? 1 : 0);
+            }
         }
         
-        internal static void SetLogging()
-        {
-            UnityVKBridge_SetLogging(_logsEnabled? 1 : 0);
-        }
 
         public void Log(object message, Object context = null)
         {
