@@ -27,6 +27,7 @@ namespace VKBridgeSDK.Runtime
 
         public static void Initialize()
         {
+            VKBridgeLogger.SetLogging();
             _logger.Log("Initializing VkBridgeFacade...");
             _vkResponseManager = new VKResponseManager();
             _logger.Log("Created: VKResponseManager...");
@@ -38,7 +39,7 @@ namespace VKBridgeSDK.Runtime
             _vkMessageReceiver.Initialize(_vkResponseManager, _eventManager);
             _urlManager = new VKUrlManager();
             _logger.Log("Created: VKUrlManager...");
-
+            
             Object.DontDestroyOnLoad(_messageReceiverObject);
 
             SpawnDebugMenu();
