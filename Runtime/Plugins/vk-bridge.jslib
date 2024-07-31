@@ -32,6 +32,10 @@ mergeInto(LibraryManager.library, {
         }
     },
 
+    UnityVKBridge_GetWindowLocationHref: function () {
+        return allocate(intArrayFromString(window.location.href), 'i8', ALLOC_STACK);
+    },
+    
     UnityVKBridge_Subscribe: function() {
         if (typeof vkBridge !== 'undefined') {
             vkBridge.subscribe(function(event) {
@@ -65,5 +69,16 @@ mergeInto(LibraryManager.library, {
                 gameInstance.SendMessage('VKMessageReceiver', 'OnFocus');
             }
         });
+        
+        if (typeof vkBridge !== 'undefined') {
+            vkBridge.subscribe(function(event) {
+                const { type } = event.detail;
+                if (type === 'VKWebAppViewHide') {
+                    gameInstance.SendMessage('VKMessageReceiver', 'OnBlur');
+                } else if (type === 'VKWebAppViewRestore') {
+                    gameInstance.SendMessage('VKMessageReceiver', 'OnFocus');
+                }
+            });
+        }
     }
 });

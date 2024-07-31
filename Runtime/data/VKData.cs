@@ -29,22 +29,6 @@ namespace VKBridgeSDK.Runtime.data
     }
 
     [Serializable]
-    public class VKLaunchParams : VKData
-    {
-        public string sign;// = "Hb67aIL4cElWINenspCpKu3tUgacikw541NCXX8zWL4",
-        public string vk_access_token_settings;//= "",
-        public int vk_app_id;//: 8142709,
-        public int vk_are_notifications_enabled;//: 0,
-        public int vk_is_app_user;//: 1,
-        public int vk_is_favorite;//: 0,
-        public string vk_language;//= "ru",
-        public string vk_platform;//= "desktop_web",
-        public string vk_ref;// "other",
-        public int vk_ts;//: 1664886146,
-        public int vk_user_id; //: 82156740
-    }
-
-    [Serializable]
     public class VKSubscriptionData : VKData
     {
         public bool success;

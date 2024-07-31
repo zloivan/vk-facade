@@ -22,6 +22,7 @@ namespace VKBridgeSDK.Runtime
         private static GameObject _messageReceiverObject;
         private static GameObject _vKMenuGameobject;
         private static VKMessageReceiver _vkMessageReceiver;
+        private static VKUrlManager _urlManager;
         private static ILogger _logger = new VKBridgeLogger();
 
         public static void Initialize()
@@ -33,7 +34,7 @@ namespace VKBridgeSDK.Runtime
             _messageReceiverObject = new GameObject("VKMessageReceiver");
             _vkMessageReceiver = _messageReceiverObject.AddComponent<VKMessageReceiver>();
             _vkMessageReceiver.Initialize(_vkResponseManager, _eventManager);
-
+            _urlManager = new VKUrlManager();
             Object.DontDestroyOnLoad(_messageReceiverObject);
 
             SpawnDebugMenu();
@@ -320,7 +321,11 @@ namespace VKBridgeSDK.Runtime
             _eventManager?.RemoveEventListener(eventType, listener);
         }
 
-        public static async UniTask<VKLaunchParams> GetLaunchParams()
+        /// <summary>
+        /// Этот метод недоступен в играх, только в мини-приложениях
+        /// </summary>
+        /// <returns></returns>
+        public static async UniTask<VKLaunchParams> GetLaunchParamsViaVkBridge()
         {
             var vkData =
                 await _vkResponseManager.CallVkMethodAsync<VKLaunchParams>("VKWebAppGetLaunchParams");
@@ -329,12 +334,17 @@ namespace VKBridgeSDK.Runtime
             return vkData;
         }
 
-        public static async UniTask<string> GetLanguageCode()
+        public static VKLaunchParams GetLaunchParams()
         {
-            var result = await GetLaunchParams();
+            return _urlManager.GetLaunchParams();
+        }
+
+        public static string GetLanguageCode()
+        {
+            var result =  GetLaunchParams();
             
             _logger.Log($"GetLanguageCode got result: {result}");
-            return result.vk_language;
+            return LaunchParamsHelper.ConvertToLanguage(result.Language);
         }
 
         /// <summary>
