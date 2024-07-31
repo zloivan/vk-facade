@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.InteropServices;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
@@ -16,11 +17,26 @@ namespace FloorIsLava.VKBridgeSDK.helpers
     {
         private const string PREFIX = "<b>VKBridgeSDK:</b>: ";
 
+        [DllImport("__Internal")]
+        private static extern void UnityVKBridge_SetLogging(int isLogingEnabled);
+
+        
+        private static readonly  bool _logsEnabled;
+
+        static VKBridgeLogger()
+        {
+            _logsEnabled = false;
+#if WEBGL_VK_DEBUG
+_logsEnabled = true;
+#endif
+            UnityVKBridge_SetLogging(_logsEnabled? 1 : 0);
+        }
+
+
         public void Log(object message, Object context = null)
         {
-#if WEBGL_VK_DEBUG
-            Debug.Log($"{PREFIX}{message}", context);
-#endif
+            if(_logsEnabled)
+                Debug.Log($"{PREFIX}{message}", context);
         }
 
         public void LogError(object message, Object context = null)

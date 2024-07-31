@@ -29,12 +29,16 @@ namespace VKBridgeSDK.Runtime
         {
             _logger.Log("Initializing VkBridgeFacade...");
             _vkResponseManager = new VKResponseManager();
+            _logger.Log("Created: VKResponseManager...");
             _eventManager = new VKEventManager();
-            _logger.Log("Initializing VkBridgeFacade...");
+            _logger.Log("Created: VKEventManager...");
             _messageReceiverObject = new GameObject("VKMessageReceiver");
             _vkMessageReceiver = _messageReceiverObject.AddComponent<VKMessageReceiver>();
+            _logger.Log("Created: VKMessageReceiver...");
             _vkMessageReceiver.Initialize(_vkResponseManager, _eventManager);
             _urlManager = new VKUrlManager();
+            _logger.Log("Created: VKUrlManager...");
+
             Object.DontDestroyOnLoad(_messageReceiverObject);
 
             SpawnDebugMenu();
@@ -62,7 +66,7 @@ namespace VKBridgeSDK.Runtime
         {
             return await _vkResponseManager.CallVkMethodAsync<T>(methodName, parameters);
         }
-        
+
         public static async UniTask<VKRequestData> CallAPIMethod(string methodName, string parameters)
         {
             return await _vkResponseManager.CallVkMethodAsync<VKRequestData>("VKWebAppCallAPIMethod",
@@ -106,7 +110,7 @@ namespace VKBridgeSDK.Runtime
                 ad_format = "reward",
                 use_waterfall = useWaterfall
             });
-            
+
             _logger.Log($"CheckNativeRewardAd got result: {vkPromise.result}");
             _logger.Log($"CheckNativeRewardAd got vkPromise: {vkPromise}");
             return vkPromise.result;
@@ -119,7 +123,7 @@ namespace VKBridgeSDK.Runtime
                 ad_format = "reward",
                 use_waterfall = useWaterfall
             });
-            
+
             _logger.Log($"ShowNativeRewardAd got result: {vkPromise.result}");
             return vkPromise.result;
         }
@@ -151,7 +155,7 @@ namespace VKBridgeSDK.Runtime
 
             var vkPromise =
                 await _vkResponseManager.CallVkMethodAsync<VKRequestData>("VKWebAppShowBannerAd", parameters);
-            
+
             _logger.Log($"ShowBannerAd got result: {vkPromise.result}");
             return vkPromise.result;
         }
@@ -159,7 +163,7 @@ namespace VKBridgeSDK.Runtime
         public static async UniTask<bool> HideBannerAd()
         {
             var vkData = await _vkResponseManager.CallVkMethodAsync<VKRequestData>("VKWebAppHideBannerAd");
-            
+
             _logger.Log($"HideBannerAd got result: {vkData.result}");
             return vkData.result;
         }
@@ -168,7 +172,7 @@ namespace VKBridgeSDK.Runtime
         public static async UniTask<bool> CheckBannerAd()
         {
             var vkData = await _vkResponseManager.CallVkMethodAsync<VKRequestData>("VKWebAppCheckBannerAd");
-            
+
             _logger.Log($"CheckBannerAd got result: {vkData.result}");
             return vkData.result;
         }
@@ -176,7 +180,7 @@ namespace VKBridgeSDK.Runtime
         public static async UniTask<bool> RecommendApp()
         {
             var vkData = await _vkResponseManager.CallVkMethodAsync<VKRequestData>("VKWebAppRecommend");
-            
+
             _logger.Log($"RecommendApp got result: {vkData.result}");
             return vkData.result;
         }
@@ -200,21 +204,21 @@ namespace VKBridgeSDK.Runtime
             bool friendsOnly = true)
         {
             object methodParameters;
-            
+
             if (!string.IsNullOrEmpty(postAttachments))
             {
-                 methodParameters = new
+                methodParameters = new
                     { message = postMessage, attachments = postAttachments, friends_only = friendsOnly };
             }
             else
             {
-                 methodParameters = new
+                methodParameters = new
                     { message = postMessage, friends_only = friendsOnly };
             }
 
             var vkPromise =
                 await _vkResponseManager.CallVkMethodAsync<VKRequestData>("VKWebAppShowWallPostBox", methodParameters);
-            
+
             _logger.Log($"ShowPostOnWall got result: {vkPromise.result}");
             return vkPromise.result;
         }
@@ -231,7 +235,7 @@ namespace VKBridgeSDK.Runtime
 
             var vkPromise =
                 await _vkResponseManager.CallVkMethodAsync<VKOrderData>("VKWebAppShowOrderBox", methodParameters);
-            
+
             _logger.Log($"ShowOrderBox got result: {vkPromise.success}");
             return vkPromise.success;
         }
@@ -250,7 +254,7 @@ namespace VKBridgeSDK.Runtime
             var vkData =
                 await _vkResponseManager.CallVkMethodAsync<VKSubscriptionData>("VKWebAppShowSubscriptionBox",
                     methodParameters);
-            
+
             _logger.Log($"ShowSubscriptionBox got result: {vkData}");
             return vkData;
         }
@@ -269,7 +273,7 @@ namespace VKBridgeSDK.Runtime
 
             var vkData =
                 await _vkResponseManager.CallVkMethodAsync<VKFriendsData>("VKWebAppGetFriends", methodParameters);
-            
+
             _logger.Log($"GetFriendList got result: {vkData}");
             return vkData;
         }
@@ -341,8 +345,8 @@ namespace VKBridgeSDK.Runtime
 
         public static string GetLanguageCode()
         {
-            var result =  GetLaunchParams();
-            
+            var result = GetLaunchParams();
+
             _logger.Log($"GetLanguageCode got result: {result}");
             return LaunchParamsHelper.ConvertToLanguage(result.Language);
         }
