@@ -12,7 +12,7 @@ namespace VKBridgeSDK.Runtime.managers
     public class VKUrlManager
     {
         [DllImport("__Internal")]
-        private static extern IntPtr GetWindowLocationHref();
+        private static extern IntPtr UnityVKBridge_GetWindowLocationHref();
 
         private readonly ILogger _logger = new VKBridgeLogger();
 
@@ -22,7 +22,7 @@ namespace VKBridgeSDK.Runtime.managers
                 return new VKLaunchParams();
             
             _logger.Log("GetLaunchParams called...");
-            var url = Marshal.PtrToStringAnsi(GetWindowLocationHref());
+            var url = Marshal.PtrToStringAnsi(UnityVKBridge_GetWindowLocationHref());
             Assert.IsNotNull(url, "URL, could not be null!");
 
             if (string.IsNullOrEmpty(url))
