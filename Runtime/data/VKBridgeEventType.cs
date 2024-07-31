@@ -27,6 +27,8 @@ namespace VKBridgeSDK.Runtime.data
         VKWebAppGetFriendsFailed,
         VKWebAppGetUserInfoResult,
         VKWebAppGetUserInfoFailed,
-        VKWebAppUpdateConfig
+        VKWebAppUpdateConfig,
+        VKWebAppGetLaunchParamsResult,
+        VKWebAppGetLaunchParamsFailed
     }
 }

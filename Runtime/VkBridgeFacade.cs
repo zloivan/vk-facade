@@ -47,7 +47,6 @@ namespace VKBridgeSDK.Runtime
             _vKMenuGameobject.SetActive(false);
         }
 
-
         /// <summary>
         /// Call custom request to VKBridge
         /// </summary>
@@ -319,6 +318,23 @@ namespace VKBridgeSDK.Runtime
         public static void RemoveEventListener(VKBridgeEventType eventType, Action<VKEventData> listener)
         {
             _eventManager?.RemoveEventListener(eventType, listener);
+        }
+
+        public static async UniTask<VKLaunchParams> GetLaunchParams()
+        {
+            var vkData =
+                await _vkResponseManager.CallVkMethodAsync<VKLaunchParams>("VKWebAppGetLaunchParams");
+
+            _logger.Log($"GetLaunchParams got result: {vkData}");
+            return vkData;
+        }
+
+        public static async UniTask<string> GetLanguageCode()
+        {
+            var result = await GetLaunchParams();
+            
+            _logger.Log($"GetLanguageCode got result: {result}");
+            return result.vk_language;
         }
 
         /// <summary>
