@@ -70,16 +70,21 @@ mergeInto(LibraryManager.library, {
                 gameInstance.SendMessage('VKMessageReceiver', 'OnFocus');
             }
         });
-        
+
         if (typeof vkBridge !== 'undefined') {
             vkBridge.subscribe(function(event) {
-                const { type } = event.detail;
-                if (type === 'VKWebAppViewHide') {
+                if (event.detail.type === 'VKWebAppViewHide') {
                     gameInstance.SendMessage('VKMessageReceiver', 'OnBlur');
-                } else if (type === 'VKWebAppViewRestore') {
+                }
+            });
+
+            vkBridge.subscribe(function(event) {
+                if (event.detail.type === 'VKWebAppViewRestore') {
                     gameInstance.SendMessage('VKMessageReceiver', 'OnFocus');
                 }
             });
+        } else {
+            console.error('vkBridge is not defined. Make sure vkBridge is loaded.');
         }
     },
 
