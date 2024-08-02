@@ -2,7 +2,7 @@ using System;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 
-namespace VKBridgeSDK.Runtime.components
+namespace vk_facade.Runtime.components
 {
     public class VKBridgeDebugMenu : MonoBehaviour
     {

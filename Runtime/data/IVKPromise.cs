@@ -1,10 +1,10 @@
 using System;
 using Cysharp.Threading.Tasks;
-using FloorIsLava.VKBridgeSDK.helpers;
 using UnityEngine;
-using ILogger = FloorIsLava.VKBridgeSDK.helpers.ILogger;
+using vk_facade.Runtime.helpers;
+using ILogger = vk_facade.Runtime.helpers.ILogger;
 
-namespace VKBridgeSDK.Runtime.data
+namespace vk_facade.Runtime.data
 {
     public interface IVKPromise
     {

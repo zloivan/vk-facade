@@ -1,7 +1,7 @@
 {
   "name": "com.zloivan.vkbridgesdk",
   "displayName": "IKhom VKBridge SDK",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "unity": "2021.1",
   "description": "Custom implementation of VKBridge SDK.",
   "keywords": [
@@ -12,10 +12,10 @@
   "repository": {
     "url": "https://github.com/zloivan/vk-facade.git",
     "type": "git",
-    "revision": "e9a5586dcd5157898d032e6f5371f23254a3ce39"
+    "revision": "8d48bf275c2cccff829d7f1d7324807228a93934"
   },
   "_upm": {
-    "changelog": "- Initial version"},
+    "changelog": "- try to fix paramms"},
   "author": {
     "name": "Ivan Khomichkov",
     "url": "https://github.com/zloivan"

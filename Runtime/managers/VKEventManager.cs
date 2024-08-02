@@ -1,12 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
-using FloorIsLava.VKBridgeSDK.helpers;
 using UnityEngine;
-using VKBridgeSDK.Runtime.data;
-using ILogger = FloorIsLava.VKBridgeSDK.helpers.ILogger;
+using vk_facade.Runtime.data;
+using vk_facade.Runtime.helpers;
+using ILogger = vk_facade.Runtime.helpers.ILogger;
 
-namespace VKBridgeSDK.Runtime.managers
+namespace vk_facade.Runtime.managers
 {
     public class VKEventManager
     {

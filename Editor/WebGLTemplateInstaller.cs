@@ -1,7 +1,7 @@
 using System.IO;
 using UnityEditor;
 
-namespace VKBridgeSDK.Editor
+namespace vk_facade.Editor
 {
     [InitializeOnLoad]
     public static class WebGLTemplateInstaller

@@ -1,4 +1,4 @@
-namespace VKBridgeSDK.Runtime.data
+namespace vk_facade.Runtime.data
 {
     public enum VKBridgeEventType // Имена инамов менять нельзя, они соответствуют именам ивентов в VK Bridge
     {

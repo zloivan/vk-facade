@@ -2,7 +2,7 @@ using System;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace VKBridgeSDK.Runtime.data
+namespace vk_facade.Runtime.data
 {
     [Serializable]
     public class VKPromiseResponse

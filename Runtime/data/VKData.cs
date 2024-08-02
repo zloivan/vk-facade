@@ -1,6 +1,6 @@
 using System;
 
-namespace VKBridgeSDK.Runtime.data
+namespace vk_facade.Runtime.data
 {
     public abstract class VKData
     {
@@ -13,7 +13,7 @@ namespace VKBridgeSDK.Runtime.data
 
         public override string ToString()
         {
-            return $"{nameof(result)}: {result}";
+            return $"{nameof(result)}: {result}"; 
         }
     }
 

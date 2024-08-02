@@ -1,20 +1,16 @@
 using System;
-using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
-using FloorIsLava.VKBridgeSDK.helpers;
 using UnityEngine;
-using VKBridgeSDK.Runtime.components;
-using VKBridgeSDK.Runtime.data;
-using VKBridgeSDK.Runtime.managers;
-using ILogger = FloorIsLava.VKBridgeSDK.helpers.ILogger;
+using vk_facade.Runtime.components;
+using vk_facade.Runtime.data;
+using vk_facade.Runtime.helpers;
+using vk_facade.Runtime.managers;
+using ILogger = vk_facade.Runtime.helpers.ILogger;
 using Object = UnityEngine.Object;
 
-namespace VKBridgeSDK.Runtime
+namespace vk_facade.Runtime
 {
-    /// <summary>
-    /// В классе используются ананимные типы не просто так,
-    /// не заменяйте ан множества, если в API VK явно не сказанно что там ожидают массив
-    /// </summary>
+    
     public static class VkBridgeFacade
     {
         private static VKResponseManager _vkResponseManager;
@@ -25,6 +21,10 @@ namespace VKBridgeSDK.Runtime
         private static VKUrlManager _urlManager;
         private static ILogger _logger = new VKBridgeLogger();
 
+        
+        /// <summary>
+        /// Инициализация Фасада, вызвать в самом начале, до использования любого из методов
+        /// </summary>
         public static void Initialize()
         {
             _logger.Log("Initializing VkBridgeFacade...");
@@ -38,7 +38,7 @@ namespace VKBridgeSDK.Runtime
             _vkMessageReceiver.Initialize(_vkResponseManager, _eventManager);
             _urlManager = new VKUrlManager();
             _logger.Log("Created: VKUrlManager...");
-            
+
             Object.DontDestroyOnLoad(_messageReceiverObject);
 
             SpawnDebugMenu();
@@ -62,7 +62,7 @@ namespace VKBridgeSDK.Runtime
         /// /// <remarks>
         /// To learn more about how to use this method, please refer to the <a href="https://dev.vk.com/ru/bridge/overview">VKBridge Documentation</a>.
         /// </remarks>
-        public static async UniTask<T> CallCustomRequest<T>(string methodName, object parameters) where T : VKData
+        public static async UniTask<T> CallCustomRequest<T>(string methodName, VKParams parameters) where T : VKData
         {
             return await _vkResponseManager.CallVkMethodAsync<T>(methodName, parameters);
         }
@@ -70,20 +70,35 @@ namespace VKBridgeSDK.Runtime
         public static async UniTask<VKRequestData> CallAPIMethod(string methodName, string parameters)
         {
             return await _vkResponseManager.CallVkMethodAsync<VKRequestData>("VKWebAppCallAPIMethod",
-                new { method = methodName, @params = parameters });
+                new VKParams
+                {
+                    { "method", methodName },
+                    { "params", parameters }
+                });
         }
 
+        /// <summary>
+        /// Инициализация VKBridge. <b>!Обязательно вызвать!</b>
+        /// </summary>
+        /// <returns>Успешно ли прошел запрос</returns>
         public static async UniTask<bool> VkBridgeInit()
         {
             var vkData = await _vkResponseManager.CallVkMethodAsync<VKRequestData>("VKWebAppInit");
             return vkData.result;
         }
 
+        /// <summary>
+        /// Показать панель приглашения друзей
+        /// </summary>
+        /// <param name="inviteRequestKey"></param>
+        /// <returns>Успешно ли прошел запрос</returns>
         public static async UniTask<bool> InviteFriend(string inviteRequestKey = null)
         {
-            var methodParameters = string.IsNullOrEmpty(inviteRequestKey)
-                ? null
-                : new { requestKey = inviteRequestKey };
+            var methodParameters = new VKParams();
+            if (string.IsNullOrEmpty(inviteRequestKey))
+            {
+                methodParameters.Add("requestKey", inviteRequestKey);
+            }
 
             var vkPromiseData =
                 await _vkResponseManager.CallVkMethodAsync<VKRequestData>("VKWebAppShowInviteBox", methodParameters);
@@ -91,38 +106,45 @@ namespace VKBridgeSDK.Runtime
             return vkPromiseData.result;
         }
 
+        /// <summary>
+        /// Проверить готов ли интер к показу, и запустить загрузку если не готов
+        /// </summary>
+        /// <param name="useWaterfall">Если интер не готов, стоил ли использовать реворд</param>
+        /// <returns>True если готов к показу</returns>
         public static async UniTask<bool> CheckNativeInterstitialAd(bool useWaterfall = true)
         {
-            var vkPromise = await _vkResponseManager.CallVkMethodAsync<VKRequestData>("VKWebAppCheckNativeAds", new
-            {
-                ad_format = "interstitial",
-                use_waterfall = useWaterfall
-            });
+            var vkPromise = await _vkResponseManager.CallVkMethodAsync<VKRequestData>("VKWebAppCheckNativeAds",
+                new VKParams
+                {
+                    { "ad_format", "interstitial" },
+                    { "use_waterfall", useWaterfall }
+                });
 
             _logger.Log($"CheckNativeInterstitialAd got result: {vkPromise.result}");
             return vkPromise.result;
         }
 
-        public static async UniTask<bool> CheckNativeRewardAd(bool useWaterfall = true)
+        /// <summary>
+        /// Проверить готов ли реворд к показу, и запустить загрузку если не готов
+        /// </summary>
+        /// <returns>True если готов к показу</returns>
+        public static async UniTask<bool> CheckNativeRewardAd()
         {
-            var vkPromise = await _vkResponseManager.CallVkMethodAsync<VKRequestData>("VKWebAppCheckNativeAds", new
-            {
-                ad_format = "reward",
-                use_waterfall = useWaterfall
-            });
+            var vkPromise = await _vkResponseManager.CallVkMethodAsync<VKRequestData>("VKWebAppCheckNativeAds",
+                new VKParams { { "ad_format", "reward" } });
 
             _logger.Log($"CheckNativeRewardAd got result: {vkPromise.result}");
-            _logger.Log($"CheckNativeRewardAd got vkPromise: {vkPromise}");
             return vkPromise.result;
         }
 
-        public static async UniTask<bool> ShowNativeRewardAd(bool useWaterfall = true)
+        /// <summary>
+        /// Показать реворд, если он готов. <b>!!ВОЗВРАТ ИЗ МЕТОДА ПРОИЗОЙДЕТ ПО ОКОНЧАНИЮ РЕВОРДА!!</b> 
+        /// </summary>
+        /// <returns>Досмотрел ли до конца</returns>
+        public static async UniTask<bool> ShowNativeRewardAd()
         {
-            var vkPromise = await _vkResponseManager.CallVkMethodAsync<VKRequestData>("VKWebAppShowNativeAds", new
-            {
-                ad_format = "reward",
-                use_waterfall = useWaterfall
-            });
+            var vkPromise = await _vkResponseManager.CallVkMethodAsync<VKRequestData>("VKWebAppShowNativeAds",
+                new VKParams { { "ad_format", "reward" } });
 
             _logger.Log($"ShowNativeRewardAd got result: {vkPromise.result}");
             return vkPromise.result;
@@ -130,27 +152,36 @@ namespace VKBridgeSDK.Runtime
 
         public static async UniTask<bool> ShowNativeInterstitialAd(bool useWaterfall = true)
         {
-            var vkPromise = await _vkResponseManager.CallVkMethodAsync<VKRequestData>("VKWebAppShowNativeAds", new
-            {
-                ad_format = "interstitial",
-                use_waterfall = useWaterfall
-            });
+            var vkPromise = await _vkResponseManager.CallVkMethodAsync<VKRequestData>("VKWebAppShowNativeAds",
+                new VKParams
+                {
+                    { "ad_format", "interstitial" },
+                    { "use_waterfall", useWaterfall }
+                });
 
             _logger.Log($"ShowNativeInterstitialAd got result: {vkPromise.result}");
             return vkPromise.result;
         }
 
+        /// <summary>
+        /// Показать баннер
+        /// </summary>
+        /// <param name="location"></param>
+        /// <param name="align"></param>
+        /// <param name="orientation"></param>
+        /// <param name="layout"></param>
+        /// <returns>Успешно ли прошел запрос</returns>
         public static async UniTask<bool> ShowBannerAd(BannerLocation location = BannerLocation.bottom,
             BannerAlign align = BannerAlign.center,
             BannerOrientation orientation = BannerOrientation.horizontal,
             BannerLayout layout = BannerLayout.resize)
         {
-            var parameters = new
+            var parameters = new VKParams
             {
-                banner_location = Enum.GetName(typeof(BannerLocation), location),
-                banner_align = Enum.GetName(typeof(BannerAlign), align),
-                banner_orientation = Enum.GetName(typeof(BannerOrientation), orientation),
-                banner_layout = Enum.GetName(typeof(BannerLayout), layout)
+                { "banner_location", Enum.GetName(typeof(BannerLocation), location) },
+                { "banner_align", Enum.GetName(typeof(BannerAlign), align) },
+                { "banner_orientation", Enum.GetName(typeof(BannerOrientation), orientation) },
+                { "banner_layout", Enum.GetName(typeof(BannerLayout), layout) }
             };
 
             var vkPromise =
@@ -160,6 +191,10 @@ namespace VKBridgeSDK.Runtime
             return vkPromise.result;
         }
 
+        /// <summary>
+        /// Спрятать банер
+        /// </summary>
+        /// <returns>Успешно ли прошел запрос</returns>
         public static async UniTask<bool> HideBannerAd()
         {
             var vkData = await _vkResponseManager.CallVkMethodAsync<VKRequestData>("VKWebAppHideBannerAd");
@@ -168,7 +203,10 @@ namespace VKBridgeSDK.Runtime
             return vkData.result;
         }
 
-
+        /// <summary>
+        /// Проверить показывается ли банер
+        /// </summary>
+        /// <returns>Показываем или нет</returns>
         public static async UniTask<bool> CheckBannerAd()
         {
             var vkData = await _vkResponseManager.CallVkMethodAsync<VKRequestData>("VKWebAppCheckBannerAd");
@@ -177,6 +215,11 @@ namespace VKBridgeSDK.Runtime
             return vkData.result;
         }
 
+        /// <summary>
+        /// Порекомендовать приложние (пока не видел успешно что бы отрабатывало, может быть есть ограничения для приложений
+        /// со стороны ВК по колличеству друзей, или статусу приложений, но надежнее использовать PublishPostOnWall)
+        /// </summary>
+        /// <returns>Успешно ли прошел запрос</returns>
         public static async UniTask<bool> RecommendApp()
         {
             var vkData = await _vkResponseManager.CallVkMethodAsync<VKRequestData>("VKWebAppRecommend");
@@ -185,39 +228,49 @@ namespace VKBridgeSDK.Runtime
             return vkData.result;
         }
 
+        /// <summary>
+        /// Показать окно лидерборда
+        /// </summary>
+        /// <param name="result">Если не отправлять результат, покажет тещий счет игрока, иначе поменяет на новый</param>
+        /// <returns>Успешно ли прошел запрос</returns>
         public static async UniTask<bool> ShowLeaderBoard(int result = -1)
         {
-            var methodParameters = result == -1
-                ? null
-                : new { user_result = result };
+            var vkParams = new VKParams();
+            if (result != -1)
+            {
+                vkParams.Add("user_result", result);
+            }
 
             var vkPromise =
                 await _vkResponseManager.CallVkMethodAsync<VKRequestData>("VKWebAppShowLeaderBoardBox",
-                    methodParameters);
+                    vkParams);
 
             _logger.Log($"ShowLeaderBoard got result: {vkPromise.result}");
             return vkPromise.result;
         }
 
+
+        /// <summary>
+        /// Показать окно публикации на стену ВК
+        /// </summary>
+        /// <param name="postMessage">Сообщение публикации</param>
+        /// <param name="postAttachments">Приложение к сообщению</param>
+        /// <param name="friendsOnly">Опубликовать только для друзей</param>
+        /// <returns>Успешно ли прошел запрос</returns>
         public static async UniTask<bool> PublishPostOnWall(string postMessage,
             string postAttachments = "",
             bool friendsOnly = true)
         {
-            object methodParameters;
+            var vkParams = new VKParams
+            {
+                { "message", postMessage },
+                { "friends_only", friendsOnly }
+            };
 
-            if (!string.IsNullOrEmpty(postAttachments))
-            {
-                methodParameters = new
-                    { message = postMessage, attachments = postAttachments, friends_only = friendsOnly };
-            }
-            else
-            {
-                methodParameters = new
-                    { message = postMessage, friends_only = friendsOnly };
-            }
+            if (!string.IsNullOrEmpty(postAttachments)) vkParams.Add("attachments", postAttachments);
 
             var vkPromise =
-                await _vkResponseManager.CallVkMethodAsync<VKRequestData>("VKWebAppShowWallPostBox", methodParameters);
+                await _vkResponseManager.CallVkMethodAsync<VKRequestData>("VKWebAppShowWallPostBox", vkParams);
 
             _logger.Log($"ShowPostOnWall got result: {vkPromise.result}");
             return vkPromise.result;
@@ -231,7 +284,11 @@ namespace VKBridgeSDK.Runtime
         /// <returns></returns>
         public static async UniTask<bool> ShowOrderBox(string itemType, string itemId)
         {
-            var methodParameters = new { type = itemType, item = itemId };
+            var methodParameters = new VKParams
+            {
+                { "type", itemType },
+                { "item", itemId }
+            };
 
             var vkPromise =
                 await _vkResponseManager.CallVkMethodAsync<VKOrderData>("VKWebAppShowOrderBox", methodParameters);
@@ -244,11 +301,11 @@ namespace VKBridgeSDK.Runtime
             string subscriptionItem,
             string subscriptionId)
         {
-            var methodParameters = new
+            var methodParameters = new VKParams
             {
-                action = Enum.GetName(typeof(SubscriptionAction), action),
-                item = subscriptionItem,
-                subscription_id = subscriptionId
+                { "action", Enum.GetName(typeof(SubscriptionAction), action) },
+                { "item", subscriptionItem },
+                { "subscription_id", subscriptionId }
             };
 
             var vkData =
@@ -266,9 +323,9 @@ namespace VKBridgeSDK.Runtime
         /// <returns></returns>
         public static async UniTask<VKFriendsData> GetFriendList(bool isMultiSelect)
         {
-            var methodParameters = new
+            var methodParameters = new VKParams
             {
-                multi = isMultiSelect
+                { "multi", isMultiSelect }
             };
 
             var vkData =
@@ -278,35 +335,22 @@ namespace VKBridgeSDK.Runtime
             return vkData;
         }
 
+        /// <summary>
+        /// Получить информацию о пользователе
+        /// </summary>
+        /// <param name="userId">ID пользователя</param>
+        /// <returns>Если ID пусто, вернет информацию по текущему пользователю</returns>
         public static async UniTask<VKUserData> GetUserData(int? userId = null)
         {
-            var methodParameters = new Dictionary<string, object>();
+            var methodParameters = new VKParams();
 
-            if (userId != null)
-            {
-                methodParameters.Add("user_id", userId);
-            }
+
+            if (userId != null) methodParameters.Add("user_id", userId);
 
             var vkData =
                 await _vkResponseManager.CallVkMethodAsync<VKUserData>("VKWebAppGetUserInfo", methodParameters);
 
             _logger.Log($"GetUserData got result: {vkData}");
-            return vkData;
-        }
-
-        public static async UniTask<VKUsersData> GetUsersData(params int[] usersId)
-        {
-            var methodParameters = new Dictionary<string, object>();
-
-            if (usersId != null)
-            {
-                methodParameters.Add("users_id", usersId);
-            }
-
-            var vkData =
-                await _vkResponseManager.CallVkMethodAsync<VKUsersData>("VKWebAppGetUserInfo", methodParameters);
-
-            _logger.Log($"GetUsersData got result: {vkData}");
             return vkData;
         }
 
@@ -340,7 +384,10 @@ namespace VKBridgeSDK.Runtime
 
         public static VKLaunchParams GetLaunchParams()
         {
-            return _urlManager.GetLaunchParams();
+            var vkLaunchParams = _urlManager.GetLaunchParams();
+
+            _logger.Log($"GetLaunchParams got result: {vkLaunchParams}");
+            return vkLaunchParams;
         }
 
         public static string GetLanguageCode()
@@ -354,7 +401,7 @@ namespace VKBridgeSDK.Runtime
         /// <summary>
         /// Used to reset static fields in Editor
         /// </summary>
-        public static void Reset()
+        public static void ResetStaticFields()
         {
             if (_messageReceiverObject != null)
             {

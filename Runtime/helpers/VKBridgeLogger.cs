@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-namespace FloorIsLava.VKBridgeSDK.helpers
+namespace vk_facade.Runtime.helpers
 {
     internal interface ILogger
     {
