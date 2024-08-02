@@ -2,13 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using Cysharp.Threading.Tasks;
-using FloorIsLava.VKBridgeSDK.helpers;
 using Newtonsoft.Json;
 using UnityEngine;
-using VKBridgeSDK.Runtime.data;
-using ILogger = FloorIsLava.VKBridgeSDK.helpers.ILogger;
+using vk_facade.Runtime.data;
+using vk_facade.Runtime.helpers;
+using ILogger = vk_facade.Runtime.helpers.ILogger;
 
-namespace VKBridgeSDK.Runtime.managers
+namespace vk_facade.Runtime.managers
 {
     public class VKResponseManager
     {
@@ -37,26 +37,24 @@ namespace VKBridgeSDK.Runtime.managers
             }
         }
 
-        public async UniTask<T> CallVkMethodAsync<T>(string methodName, object parameters = null) where T : VKData
+        public async UniTask<T> CallVkMethodAsync<T>(string methodName, VKParams parameters = default) where T : VKData
         {
             var vkPromise = new VKPromise<T>();
             _promises[methodName] = vkPromise;
 
-            var paramsString = parameters != null
-                ? JsonConvert.SerializeObject(parameters)
-                : string.Empty;
-
             if (!Application.isEditor)
             {
-                UnityVKBridge_SendMessage(methodName, paramsString);
+                UnityVKBridge_SendMessage(methodName, parameters?.GetParams());
             }
             else
             {
+                //Editor simulation, since in editor methods will never return value
                 UniTask.Delay(300);
                 var defaultInstance = Activator.CreateInstance<T>();
                 vkPromise.CompletionSource.TrySetResult(defaultInstance);
-                _logger.Log($"VKBridge.send<T>({methodName}, {paramsString}) called");
             }
+            
+            _logger.Log($"VKBridge.send<T>({methodName}, {parameters?.GetParams()}) called");
 
             return await vkPromise.CompletionSource.Task;
         }
