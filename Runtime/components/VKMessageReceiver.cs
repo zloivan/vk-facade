@@ -1,13 +1,13 @@
 using System;
-using FloorIsLava.VKBridgeSDK.helpers;
 using JetBrains.Annotations;
 using UnityEngine;
-using VKBridgeSDK.Runtime.data;
-using VKBridgeSDK.Runtime.managers;
-using ILogger = FloorIsLava.VKBridgeSDK.helpers.ILogger;
+using vk_facade.Runtime.data;
+using vk_facade.Runtime.helpers;
+using vk_facade.Runtime.managers;
+using ILogger = vk_facade.Runtime.helpers.ILogger;
 
 
-namespace VKBridgeSDK.Runtime.components
+namespace vk_facade.Runtime.components
 {
     public class VKMessageReceiver : MonoBehaviour
     {

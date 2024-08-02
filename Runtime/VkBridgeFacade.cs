@@ -1,15 +1,14 @@
 using System;
-using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
-using FloorIsLava.VKBridgeSDK.helpers;
 using UnityEngine;
-using VKBridgeSDK.Runtime.components;
-using VKBridgeSDK.Runtime.data;
-using VKBridgeSDK.Runtime.managers;
-using ILogger = FloorIsLava.VKBridgeSDK.helpers.ILogger;
+using vk_facade.Runtime.components;
+using vk_facade.Runtime.data;
+using vk_facade.Runtime.helpers;
+using vk_facade.Runtime.managers;
+using ILogger = vk_facade.Runtime.helpers.ILogger;
 using Object = UnityEngine.Object;
 
-namespace VKBridgeSDK.Runtime
+namespace vk_facade.Runtime
 {
     
     public static class VkBridgeFacade

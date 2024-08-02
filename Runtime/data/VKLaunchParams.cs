@@ -1,6 +1,6 @@
 using System;
 
-namespace VKBridgeSDK.Runtime.data
+namespace vk_facade.Runtime.data
 {
     [Serializable]
     public class VKLaunchParams : VKData

@@ -1,8 +1,8 @@
 using UnityEditor;
 using UnityEngine;
-using VKBridgeSDK.Runtime;
+using vk_facade.Runtime;
 
-namespace VKBridgeSDK.Editor
+namespace vk_facade.Editor
 {
 
     [InitializeOnLoad]
@@ -18,7 +18,7 @@ namespace VKBridgeSDK.Editor
             Debug.Log("Reset called");
             if (state == PlayModeStateChange.ExitingPlayMode)
             {
-                VkBridgeFacade.Reset();
+                VkBridgeFacade.ResetStaticFields();
             }
         }
     }

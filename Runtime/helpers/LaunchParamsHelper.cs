@@ -1,4 +1,4 @@
-namespace FloorIsLava.VKBridgeSDK.helpers
+namespace vk_facade.Runtime.helpers
 {
     public static class LaunchParamsHelper
     {
