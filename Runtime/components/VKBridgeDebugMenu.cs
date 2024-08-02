@@ -1,5 +1,7 @@
 using System;
 using Cysharp.Threading.Tasks;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using UnityEngine;
 
 namespace vk_facade.Runtime.components
@@ -35,12 +37,12 @@ namespace vk_facade.Runtime.components
 
         private Vector2 scrollPosition = Vector2.zero;
 
-        
+
         private void DrawDebugMenu()
         {
             const float MENU_WIDTH = 250f;
             const float MENU_HEIGHT = 600;
-            
+
             var menuX = (Screen.width - MENU_WIDTH) / 2f;
             var menuY = (Screen.height - MENU_HEIGHT) / 2f;
 
@@ -121,19 +123,31 @@ namespace vk_facade.Runtime.components
             {
                 PublishPostOnWall().Forget();
             }
-            
+
             //GetUserData();
             if (GUILayout.Button("Get user data"))
             {
                 GetUserData().Forget();
             }
-            
+
             //ShowOrderBox();
             if (GUILayout.Button("Show Order Box"))
             {
                 ShowOrderBox().Forget();
             }
             
+            //ShowOrderBox();
+            if (GUILayout.Button("Save data"))
+            {
+                SaveDataToStorage().Forget();
+            }
+            
+            //ShowOrderBox();
+            if (GUILayout.Button("Load data"))
+            {
+                LoadDataFromStorage().Forget();
+            }
+
             // End the scroll view
             GUILayout.EndScrollView();
             GUILayout.EndArea();
@@ -281,13 +295,13 @@ namespace vk_facade.Runtime.components
             }
         }
 
-        private async UniTaskVoid PublishPostOnWall()//TODO Missing require param
+        private async UniTaskVoid PublishPostOnWall()
         {
             try
             {
                 await VkBridgeFacade.PublishPostOnWall($"Думаете, вы лучше меня? Попробуйте побить мой рекорд: " +
-                                                           $"{1500}?! \nЖду вас здесь: ",
-                        $"https://vk.com/app52010090");
+                                                       $"{1500}?! \nЖду вас здесь: ",
+                    $"https://vk.com/app52010090");
             }
             catch (Exception e)
             {
@@ -295,7 +309,7 @@ namespace vk_facade.Runtime.components
                 throw;
             }
         }
-        
+
         private async UniTaskVoid GetFriendsList()
         {
             try
@@ -311,12 +325,12 @@ namespace vk_facade.Runtime.components
                 throw e;
             }
         }
-        
+
         private async UniTaskVoid GetUserData()
         {
             try
             {
-                var userData= await VkBridgeFacade.GetUserData();
+                var userData = await VkBridgeFacade.GetUserData();
                 Debug.Log(userData);
             }
             catch (Exception e)
@@ -329,7 +343,7 @@ namespace vk_facade.Runtime.components
         {
             try
             {
-                var orderId = await VkBridgeFacade.ShowOrderBox("Товар 1", "100 рублей");//TODO incorrect params
+                var orderId = await VkBridgeFacade.ShowOrderBox("Товар 1", "100 рублей");
                 Debug.Log($"Order ID: {orderId}");
             }
             catch (Exception e)
@@ -339,5 +353,60 @@ namespace vk_facade.Runtime.components
             }
         }
 
+        private async UniTaskVoid SaveDataToStorage()
+        {
+            try
+            {
+                Debug.Log(
+                    "Setting data:[apple, green], [daysInWeek, 7], [earthIsFlat, false], [person, {name=john, age=5, gender=male}]");
+
+                var jObject = JsonConvert.SerializeObject(new { name = "john", age = 5, gender = "male" });
+
+
+                if (await VkBridgeFacade.StorageSet("apple", "green")) Debug.Log("Apple is saved");
+                if (await VkBridgeFacade.StorageSet("daysInWeek", 7.ToString())) Debug.Log("Days in week is saved");
+                if (await VkBridgeFacade.StorageSet("earthIsFlat", false.ToString()))
+                    Debug.Log("Earth is flat is saved");
+                if (await VkBridgeFacade.StorageSet("person", jObject)) Debug.Log("Person is saved");
+
+                Debug.Log("Data saved to storage");
+            }
+            catch (Exception e)
+            {
+                Debug.LogError(e);
+                throw;
+            }
+        }
+
+        private async UniTaskVoid LoadDataFromStorage()
+        {
+            try
+            {
+                var vkStorage = await VkBridgeFacade.StorageGet("apple", "daysInWeek", "earthIsFlat", "person");
+
+
+                Debug.Log($"Apple is: {vkStorage["apple"]}");
+                Debug.Log($"Days in week: {vkStorage["daysInWeek"]}");
+                Debug.Log($"Earth is flat: {vkStorage["earthIsFlat"]}");
+                
+                try
+                {
+                    var person = JsonConvert.DeserializeObject<JObject>(vkStorage["person"]);
+
+                    Debug.Log(
+                        $"Person is: Name: {person["name"]}, Age: {person["age"]?.ToObject<int>()}, Gender: {person["gender"]}");
+                }
+                catch (Exception e)
+                {
+                    Debug.LogError(e);
+                    throw;
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.LogError(e);
+                throw;
+            }
+        }
     }
 }

@@ -236,7 +236,29 @@ namespace vk_facade.Runtime.data
         [JsonProperty("keys")]
         public List<VKStorageKeyValue> keys;
         public override bool IsValid => keys != null && keys.Count > 0;
-
+        private Dictionary<string, string> _keysDictionary;
+        
+        private void InitializeDictionary()
+        {
+            _keysDictionary = new Dictionary<string, string>();
+            foreach (var kv in keys)
+            {
+                _keysDictionary[kv.key] = kv.value;
+            }
+        }
+        
+        public string this[string key]
+        {
+            get
+            {
+                if (_keysDictionary == null)
+                {
+                    InitializeDictionary();
+                }
+                
+                return _keysDictionary.GetValueOrDefault(key);
+            }
+        }
         
         [Serializable]
         public class VKStorageKeyValue
