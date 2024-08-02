@@ -1,9 +1,17 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using UnityEngine;
+using vk_facade.Runtime.helpers;
+using ILogger = vk_facade.Runtime.helpers.ILogger;
 
 namespace vk_facade.Runtime.data
 {
     public abstract class VKData
     {
+        public abstract bool IsValid { get; }
     }
 
     [Serializable]
@@ -13,8 +21,10 @@ namespace vk_facade.Runtime.data
 
         public override string ToString()
         {
-            return $"{nameof(result)}: {result}"; 
+            return $"{nameof(result)}: {result}";
         }
+
+        public override bool IsValid => true;
     }
 
     [Serializable]
@@ -26,18 +36,22 @@ namespace vk_facade.Runtime.data
         {
             return $"{nameof(success)}: {success}";
         }
+
+        public override bool IsValid => true;
     }
 
     [Serializable]
     public class VKSubscriptionData : VKData
     {
         public bool success;
-        public int subscriptionId;
+        public int subscriptionId = -1;
 
         public override string ToString()
         {
             return $"{nameof(success)}: {success}, {nameof(subscriptionId)}: {subscriptionId}";
         }
+
+        public override bool IsValid => subscriptionId != -1;
     }
 
     [Serializable]
@@ -49,12 +63,15 @@ namespace vk_facade.Runtime.data
         {
             return $"{nameof(users)}: {users}";
         }
+
+        public override bool IsValid => users != null && users.Length > 0;
     }
 
     [Serializable]
     public class VKUsersData : VKData // Ето не я ебанутый, это в вк так сделали
     {
         public VKUserData[] result;
+        public override bool IsValid => result != null && result.Length > 0;
     }
 
     [Serializable]
@@ -66,6 +83,8 @@ namespace vk_facade.Runtime.data
         {
             return $"{nameof(detail)}: {detail}";
         }
+
+        public override bool IsValid => detail != null && detail.IsValid;
     }
 
     [Serializable]
@@ -78,6 +97,8 @@ namespace vk_facade.Runtime.data
         {
             return $"{nameof(type)}: {type}, {nameof(data)}: {data}";
         }
+
+        public override bool IsValid => !string.IsNullOrEmpty(type) && data != null && data.IsValid;
     }
 
     [Serializable]
@@ -108,6 +129,8 @@ namespace vk_facade.Runtime.data
             return
                 $"{nameof(result)}: {result}, {nameof(reason)}: {reason}, {nameof(banner_width)}: {banner_width}, {nameof(banner_height)}: {banner_height}, {nameof(banner_location)}: {banner_location}, {nameof(banner_align)}: {banner_align}, {nameof(orientation)}: {orientation}, {nameof(layout_type)}: {layout_type}, {nameof(success)}: {success}, {nameof(notSentIds)}: {notSentIds}, {nameof(requestKey)}: {requestKey}, {nameof(app_id)}: {app_id}, {nameof(api_host)}: {api_host}, {nameof(post_id)}: {post_id}, {nameof(error_type)}: {error_type}, {nameof(error_data)}: {error_data}, {nameof(users)}: {users}";
         }
+
+        public override bool IsValid => true; // Any field of that class can be filled or be empty
     }
 
     [Serializable]
@@ -126,6 +149,13 @@ namespace vk_facade.Runtime.data
             return
                 $"{nameof(id)}: {id}, {nameof(first_name)}: {first_name}, {nameof(last_name)}: {last_name}, {nameof(sex)}: {sex}, {nameof(photo_200)}: {photo_200}, {nameof(city)}: {city}, {nameof(country)}: {country}";
         }
+
+        public override bool IsValid =>
+            id != 0
+            && !string.IsNullOrEmpty(first_name)
+            && !string.IsNullOrEmpty(last_name)
+            && city != null
+            && country != null;
     }
 
     [Serializable]
@@ -138,6 +168,8 @@ namespace vk_facade.Runtime.data
         {
             return $"{nameof(id)}: {id}, {nameof(title)}: {title}";
         }
+
+        public override bool IsValid => !string.IsNullOrEmpty(title);
     }
 
     [Serializable]
@@ -150,6 +182,8 @@ namespace vk_facade.Runtime.data
         {
             return $"{nameof(id)}: {id}, {nameof(title)}: {title}";
         }
+
+        public override bool IsValid => !string.IsNullOrEmpty(title);
     }
 
     [Serializable]
@@ -158,11 +192,13 @@ namespace vk_facade.Runtime.data
         public string type;
         public Data data;
 
+        public override bool IsValid => !string.IsNullOrEmpty(type) && data != null;
+
         public override string ToString()
         {
             return $"{nameof(type)}: {type}, {nameof(data)}: {data}";
         }
-        
+
         [Serializable]
         public class Data
         {
@@ -192,6 +228,31 @@ namespace vk_facade.Runtime.data
                     $"{nameof(error_code)}: {error_code}, {nameof(error_reason)}: {error_reason}, {nameof(error_description)}: {error_description}, {nameof(error_msg)}: {error_msg}, {nameof(error)}: {error}";
             }
         }
+    }
+
+    [Serializable]
+    public class VKStorageData : VKData
+    {
+        [JsonProperty("keys")]
+        public List<VKStorageKeyValue> keys;
+        public override bool IsValid => keys != null && keys.Count > 0;
+
+        
+        [Serializable]
+        public class VKStorageKeyValue
+        {
+            public string key;
+            public string value;
+        }
+    }
+    
+    [Serializable]
+    public class VKStorageKeys : VKData
+    {
+        [JsonProperty("keys")]
+        public string[] keys;
+
+        public override bool IsValid => keys != null;
     }
 
     public enum BannerLocation

@@ -1,5 +1,6 @@
 using System;
 using Cysharp.Threading.Tasks;
+using Newtonsoft.Json;
 using UnityEngine;
 using vk_facade.Runtime.helpers;
 using ILogger = vk_facade.Runtime.helpers.ILogger;
@@ -20,7 +21,39 @@ namespace vk_facade.Runtime.data
         public void SetResult(string jsonData)
         {
             _logger.Log($"SetResult called, json Data: {jsonData}");
-            var data = JsonUtility.FromJson<T>(jsonData);
+        
+            T data;
+            try
+            {
+                data = JsonUtility.FromJson<T>(jsonData);
+                if (!data.IsValid)
+                {
+                    throw new Exception("JsonUtility failed to deserialize data.");
+                }
+                _logger.Log("Deserialization using JsonUtility was successful.");
+            }
+            catch (Exception ex)
+            {
+                _logger.Log($"JsonUtility deserialization failed: {ex.Message}. Falling back to Newtonsoft.Json.");
+                try
+                {
+                    data = JsonConvert.DeserializeObject<T>(jsonData);
+                    if (data.IsValid)
+                    {
+                        _logger.Log("Deserialization using Newtonsoft.Json was successful.");
+                    }
+                    else
+                    {
+                        throw new JsonException();
+                    }
+                }
+                catch (JsonException newtonEx)
+                {
+                    _logger.LogError($"Newtonsoft.Json deserialization also failed: {newtonEx.Message}");
+                    CompletionSource.TrySetException(new Exception("Deserialization failed with both JsonUtility and Newtonsoft.Json."));
+                    return;
+                }
+            }
 
             _logger.Log($"Deserialized data: {data}");
             CompletionSource.TrySetResult(data);
@@ -29,8 +62,42 @@ namespace vk_facade.Runtime.data
         public void SetException(string jsonExceptionData)
         {
             _logger.Log($"SetException called, json Data: {jsonExceptionData} ");
-            
-            var error = JsonUtility.FromJson<VKError>(jsonExceptionData);
+
+            VKError error;
+            try
+            {
+                error = JsonUtility.FromJson<VKError>(jsonExceptionData);
+                
+                if (!error.IsValid)
+                {
+                    throw new Exception("JsonUtility failed to deserialize error.");
+                }
+                
+                _logger.Log("Deserialization using JsonUtility was successful.");
+            }
+            catch (Exception e)
+            {
+                _logger.Log($"JsonUtility deserialization failed: {e.Message}. Falling back to Newtonsoft.Json.");
+
+                try
+                {
+                    error = JsonConvert.DeserializeObject<VKError>(jsonExceptionData);
+                    if (error.IsValid)
+                    {
+                        _logger.Log("Deserialization using Newtonsoft.Json was successful.");
+                    }
+                    else
+                    {
+                        throw new JsonException();
+                    }
+                }
+                catch (JsonException exception)
+                {
+                    _logger.LogError($"Newtonsoft.Json deserialization also failed: {exception.Message}");
+                    CompletionSource.TrySetException(new Exception("Deserialization failed with both JsonUtility and Newtonsoft.Json."));
+                    return;
+                }
+            }
             
             _logger.Log($"Deserialized data: {jsonExceptionData}");
             

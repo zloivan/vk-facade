@@ -188,7 +188,7 @@ namespace vk_facade.Runtime.managers
                 }
             }
 
-
+            Debug.Assert(launchParams.IsValid, "Invalid launch parameters, not parsed correctly!");
             _logger.Log($"Populated launch params: {launchParams}");
 
             return launchParams;

@@ -10,7 +10,6 @@ using Object = UnityEngine.Object;
 
 namespace vk_facade.Runtime
 {
-    
     public static class VkBridgeFacade
     {
         private static VKResponseManager _vkResponseManager;
@@ -21,7 +20,7 @@ namespace vk_facade.Runtime
         private static VKUrlManager _urlManager;
         private static ILogger _logger = new VKBridgeLogger();
 
-        
+
         /// <summary>
         /// Инициализация Фасада, вызвать в самом начале, до использования любого из методов
         /// </summary>
@@ -390,12 +389,65 @@ namespace vk_facade.Runtime
             return vkLaunchParams;
         }
 
+        /// <summary>
+        /// Получить код языка пользователя <a href="https://dev.vk.com/ru/api/api-requests#%D0%9E%D0%B1%D1%89%D0%B8%D0%B5%20%D0%BF%D0%B0%D1%80%D0%B0%D0%BC%D0%B5%D1%82%D1%80%D1%8B">Общие параметры</a>
+        /// </summary>
+        /// <returns>0=>"ru", 1 =>"uk", 2 => "be", 3 =>"en", 4 =>"es", 5 =>"fi", 6 =>"de",7 =>"it", _ =>"en"</returns>
         public static string GetLanguageCode()
         {
             var result = GetLaunchParams();
 
             _logger.Log($"GetLanguageCode got result: {result}");
             return LaunchParamsHelper.ConvertToLanguage(result.Language);
+        }
+
+        /// <summary>
+        /// Получить набор значений по ключам
+        /// </summary>
+        /// <param name="parameters">Список ключей по которым нужно вернуть значения</param>
+        /// <returns>Список ключ - значение, обернутые в <see cref="VKStorageData"/></returns>
+        public static async UniTask<VKStorageData> StorageGet(params string[] parameters)
+        {
+            var vkParams = new VKParams
+            {
+                { "keys", parameters }
+            };
+
+            var vkData =
+                await _vkResponseManager.CallVkMethodAsync<VKStorageData>("VKWebAppStorageGet", vkParams);
+
+            _logger.Log($"StorageGet got result: {vkData}");
+            return vkData;
+        }
+
+        /// <summary>
+        /// Записывает новое значение по ключу.
+        /// </summary>
+        /// <param name="key">Ключ по которому забирается значение</param>
+        /// <param name="value">Если тут пустая строка, тогда значение удаляется из хранилища</param>
+        /// <returns>Успешный ли запрос</returns>
+        public static async UniTask<bool> StorageSet(string key, string value)
+        {
+            var vkParams = new VKParams
+            {
+                { "key", key },
+                { "value", value }
+            };
+            
+            var vkData =
+                await _vkResponseManager.CallVkMethodAsync<VKRequestData>("VKWebAppStorageSet", vkParams);
+
+            _logger.Log($"StorageSet got result: {vkData.result}");
+            return vkData.result;
+        }
+
+        public static async UniTask<VKStorageKeys> StorageGetKeys()
+        {
+            var vkData =
+                await _vkResponseManager.CallVkMethodAsync<VKStorageKeys>("VKWebAppStorageGetKeys");
+
+            _logger.Log($"StorageGetKeys got result: {vkData}");
+            return vkData;
         }
 
         /// <summary>
