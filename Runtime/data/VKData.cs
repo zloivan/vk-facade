@@ -235,31 +235,34 @@ namespace vk_facade.Runtime.data
     {
         [JsonProperty("keys")]
         public List<VKStorageKeyValue> keys;
+
         public override bool IsValid => keys != null && keys.Count > 0;
         private Dictionary<string, string> _keysDictionary;
-        
-        private void InitializeDictionary()
+
+        private Dictionary<string, string> InitializeDictionary()
         {
-            _keysDictionary = new Dictionary<string, string>();
+            var result = new Dictionary<string, string>();
             foreach (var kv in keys)
             {
-                _keysDictionary[kv.key] = kv.value;
+                result[kv.key] = kv.value;
             }
+
+            return result;
         }
-        
+
         public string this[string key]
         {
             get
             {
                 if (_keysDictionary == null)
                 {
-                    InitializeDictionary();
+                    _keysDictionary =  InitializeDictionary();
                 }
-                
-                return _keysDictionary.GetValueOrDefault(key);
+
+                return _keysDictionary.TryGetValue(key, out var value) ? value : null;
             }
         }
-        
+
         [Serializable]
         public class VKStorageKeyValue
         {
@@ -267,7 +270,7 @@ namespace vk_facade.Runtime.data
             public string value;
         }
     }
-    
+
     [Serializable]
     public class VKStorageKeys : VKData
     {

@@ -3,6 +3,7 @@ using Cysharp.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using UnityEngine;
+using vk_facade.Runtime.data;
 
 namespace vk_facade.Runtime.components
 {
@@ -382,7 +383,7 @@ namespace vk_facade.Runtime.components
         {
             try
             {
-                var vkStorage = await VkBridgeFacade.StorageGet("apple", "daysInWeek", "earthIsFlat", "person");
+                VKStorageData vkStorage = await VkBridgeFacade.StorageGet("apple", "daysInWeek", "earthIsFlat", "person");
 
 
                 Debug.Log($"Apple is: {vkStorage["apple"]}");
