@@ -427,11 +427,15 @@ namespace vk_facade.Runtime
         /// <returns>Успешный ли запрос</returns>
         public static async UniTask<bool> StorageSet(string key, string value)
         {
+            _logger.Log("BRIDGE_FACADE", $"StorageSet method called with [{key},{value}]...");
+
             var vkParams = new VKParams
             {
                 { "key", key },
                 { "value", value }
             };
+
+            _logger.Log("BRIDGE_FACADE", $"StorageSet params: {vkParams.GetParams()}");
 
             var vkData =
                 await _vkResponseManager.CallVkMethodAsync<VKRequestData>("VKWebAppStorageSet", vkParams);
@@ -440,10 +444,16 @@ namespace vk_facade.Runtime
             return vkData.result;
         }
 
-        public static async UniTask<VKStorageKeys> StorageGetKeys()
+        public static async UniTask<VKStorageKeys> StorageGetKeys(int numKeyNamesToGet, int offset)
         {
+            var vkParams = new VKParams
+            {
+                { "count", numKeyNamesToGet },
+                { "offset", offset }
+            };
+
             var vkData =
-                await _vkResponseManager.CallVkMethodAsync<VKStorageKeys>("VKWebAppStorageGetKeys");
+                await _vkResponseManager.CallVkMethodAsync<VKStorageKeys>("VKWebAppStorageGetKeys", vkParams);
 
             _logger.Log("BRIDGE_FACADE", $"StorageGetKeys got result: {vkData}");
             return vkData;
