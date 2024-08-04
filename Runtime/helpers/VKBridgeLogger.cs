@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.InteropServices;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
@@ -6,6 +7,21 @@ namespace vk_facade.Runtime.helpers
 {
     internal class VKBridgeLogger : ILogger
     {
+        [DllImport("__Internal")]
+        private static extern void UnityVKBridge_SetLogging(int isLogingEnabled);
+
+        internal VKBridgeLogger()
+        {
+            var logsEnabled = false;
+#if WEBGL_VK_DEBUG
+            logsEnabled = true;
+#endif
+            if (Application.isEditor == false)
+            {
+                UnityVKBridge_SetLogging(logsEnabled ? 1 : 0);
+            }
+        }
+        
         void ILogger.LogException(Exception exception)
         {
             LogException(exception);
