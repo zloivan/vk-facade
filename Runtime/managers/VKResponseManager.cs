@@ -6,7 +6,6 @@ using Newtonsoft.Json;
 using UnityEngine;
 using vk_facade.Runtime.data;
 using vk_facade.Runtime.helpers;
-using ILogger = vk_facade.Runtime.helpers.ILogger;
 
 namespace vk_facade.Runtime.managers
 {
@@ -14,7 +13,7 @@ namespace vk_facade.Runtime.managers
     {
         private readonly Dictionary<string, IVKPromise> _promises = new Dictionary<string, IVKPromise>();
         private readonly ILogger _logger = new VKBridgeLogger();
-        
+
         [DllImport("__Internal")]
         private static extern void UnityVKBridge_SendMessage(string methodName, string parameters);
 
@@ -53,26 +52,28 @@ namespace vk_facade.Runtime.managers
                 var defaultInstance = Activator.CreateInstance<T>();
                 vkPromise.CompletionSource.TrySetResult(defaultInstance);
             }
-            
-            _logger.Log($"VKBridge.send<T>({methodName}, {parameters?.GetParams()}) called");
+
+            _logger.Log("RESPONSE_MANAGER", $"VKBridge.send<T>({methodName}, {parameters?.GetParams()}) called");
 
             return await vkPromise.CompletionSource.Task;
         }
 
         public void HandlePromiseResponse(string jsonResponse)
         {
-            _logger.Log($"GOT RESPONSE FROM PROMISE JSON: {jsonResponse}");
+            _logger.Log("RESPONSE_MANAGER", $"GOT RESPONSE FROM PROMISE JSON: {jsonResponse}");
             VKPromiseResponse response;
             try
             {
                 response = JsonConvert.DeserializeObject<VKPromiseResponse>(jsonResponse);
-                _logger.Log($"Deserialized by newton RESPONSE FROM PROMISE data: {response.data}");
-                _logger.Log($"Deserialized by newton RESPONSE FROM PROMISE error: {response.error}");
-                _logger.Log($"Deserialized by newton RESPONSE FROM PROMISE error: {response.method}");
+                _logger.Log("RESPONSE_MANAGER", $"Deserialized by newton RESPONSE FROM PROMISE data: {response.data}");
+                _logger.Log("RESPONSE_MANAGER",
+                    $"Deserialized by newton RESPONSE FROM PROMISE error: {response.error}");
+                _logger.Log("RESPONSE_MANAGER",
+                    $"Deserialized by newton RESPONSE FROM PROMISE error: {response.method}");
             }
-            catch  (JsonReaderException ex)
+            catch (JsonReaderException ex)
             {
-                _logger.LogError($"JsonReaderException: {ex.Message}");
+                _logger.LogError("RESPONSE_MANAGER", $"JsonReaderException: {ex.Message}");
                 throw;
             }
 
@@ -85,19 +86,20 @@ namespace vk_facade.Runtime.managers
 
         public void HandleErrorResponse(string jsonResponse)
         {
-            
-            _logger.Log($"GOT RESPONSE FROM PROMISE JSON: {jsonResponse}");
+            _logger.Log("RESPONSE_MANAGER", $"GOT RESPONSE FROM PROMISE JSON: {jsonResponse}");
             VKPromiseResponse response;
             try
             {
                 response = JsonConvert.DeserializeObject<VKPromiseResponse>(jsonResponse);
-                _logger.Log($"Deserialized by newton RESPONSE FROM PROMISE data: {response.data}");
-                _logger.Log($"Deserialized by newton RESPONSE FROM PROMISE error: {response.error}");
-                _logger.Log($"Deserialized by newton RESPONSE FROM PROMISE error: {response.method}");
+                _logger.Log("RESPONSE_MANAGER", $"Deserialized by newton RESPONSE FROM PROMISE data: {response.data}");
+                _logger.Log("RESPONSE_MANAGER",
+                    $"Deserialized by newton RESPONSE FROM PROMISE error: {response.error}");
+                _logger.Log("RESPONSE_MANAGER",
+                    $"Deserialized by newton RESPONSE FROM PROMISE error: {response.method}");
             }
             catch (JsonReaderException exception)
             {
-                _logger.LogError($"JsonReaderException: {exception.Message}");
+                _logger.LogError("RESPONSE_MANAGER", $"JsonReaderException: {exception.Message}");
                 throw;
             }
 
@@ -116,7 +118,7 @@ namespace vk_facade.Runtime.managers
             }
             else
             {
-                _logger.Log($"VKBridge.alert({message}) called");
+                _logger.Log("RESPONSE_MANAGER",$"VKBridge.alert({message}) called");
             }
         }
     }

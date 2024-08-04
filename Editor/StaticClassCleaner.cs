@@ -15,7 +15,6 @@ namespace vk_facade.Editor
 
         private static void OnPlayModeStateChanged(PlayModeStateChange state)
         {
-            Debug.Log("Reset called");
             if (state == PlayModeStateChange.ExitingPlayMode)
             {
                 VkBridgeFacade.ResetStaticFields();

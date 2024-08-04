@@ -2,7 +2,8 @@
     "name": "VKBridgeSDK-Editor",
     "rootNamespace": "",
     "references": [
-        "VKBridgeSDK"
+        "VKBridgeSDK",
+        "UniTask"
     ],
     "includePlatforms": [
         "Editor"

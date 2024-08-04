@@ -5,7 +5,6 @@ using UnityEngine;
 using UnityEngine.Assertions;
 using vk_facade.Runtime.data;
 using vk_facade.Runtime.helpers;
-using ILogger = vk_facade.Runtime.helpers.ILogger;
 
 namespace vk_facade.Runtime.managers
 {
@@ -21,7 +20,7 @@ namespace vk_facade.Runtime.managers
             if (Application.isEditor)
                 return new VKLaunchParams();
             
-            _logger.Log("GetLaunchParams called...");
+            _logger.Log("URL_MANAGER","GetLaunchParams called...");
             var url = Marshal.PtrToStringAnsi(UnityVKBridge_GetWindowLocationHref());
             Assert.IsNotNull(url, "URL, could not be null!");
 
@@ -30,10 +29,10 @@ namespace vk_facade.Runtime.managers
                 return null;
             }
 
-            _logger.Log($"Got url: {url}");
+            _logger.Log("URL_MANAGER",$"Got url: {url}");
 
             var uri = new Uri(url);
-            _logger.Log($"Resulting uri: {uri}");
+            _logger.Log("URL_MANAGER",$"Resulting uri: {uri}");
 
             var queryString = uri.Query;
             var queryDictionary = ParseQueryString(queryString);
@@ -42,9 +41,9 @@ namespace vk_facade.Runtime.managers
 
         private Dictionary<string, string> ParseQueryString(string queryString)
         {
-            _logger.Log("ParseQueryString called...");
+            _logger.Log("URL_MANAGER","ParseQueryString called...");
             var queryDictionary = new Dictionary<string, string>();
-            _logger.Log($"Query string: {queryString}");
+            _logger.Log("URL_MANAGER",$"Query string: {queryString}");
             if (string.IsNullOrEmpty(queryString))
                 return queryDictionary;
 
@@ -52,16 +51,16 @@ namespace vk_facade.Runtime.managers
 
             foreach (var segment in querySegments)
             {
-                _logger.Log($"Segment: {segment}");
+                _logger.Log("URL_MANAGER",$"Segment: {segment}");
                 var parts = segment.Split('=');
                 var partsNotEmpty = parts.Length > 1;
-                _logger.Log($"Parts not empty: {partsNotEmpty}");
+                _logger.Log("URL_MANAGER",$"Parts not empty: {partsNotEmpty}");
 
                 if (partsNotEmpty)
                 {
                     queryDictionary[parts[0]] = Uri.UnescapeDataString(parts[1]);
 
-                    _logger.Log($"Query dictionary[{parts[0]}]: {queryDictionary[parts[0]]}");
+                    _logger.Log("URL_MANAGER",$"Query dictionary[{parts[0]}]: {queryDictionary[parts[0]]}");
                 }
                 else
                 {
@@ -189,7 +188,7 @@ namespace vk_facade.Runtime.managers
             }
 
             Debug.Assert(launchParams.IsValid, "Invalid launch parameters, not parsed correctly!");
-            _logger.Log($"Populated launch params: {launchParams}");
+            _logger.Log("URL_MANAGER",$"Populated launch params: {launchParams}");
 
             return launchParams;
         }

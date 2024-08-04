@@ -4,12 +4,15 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using UnityEngine;
 using vk_facade.Runtime.data;
+using vk_facade.Runtime.helpers;
+using ILogger = UnityEngine.ILogger;
 
 namespace vk_facade.Runtime.components
 {
     public class VKBridgeDebugMenu : MonoBehaviour
     {
         private bool _showDebugMenu;
+        private readonly ILogger _logger = new VKBridgeLogger();
 
         private void OnGUI()
         {
@@ -136,13 +139,31 @@ namespace vk_facade.Runtime.components
             {
                 ShowOrderBox().Forget();
             }
-            
+
             //ShowOrderBox();
             if (GUILayout.Button("Save data"))
             {
-                SaveDataToStorage().Forget();
+                SaveApple().Forget();
             }
             
+            //ShowOrderBox();
+            if (GUILayout.Button("Save days of week"))
+            {
+                SaveDaysInWeek().Forget();
+            }
+            
+            //ShowOrderBox();
+            if (GUILayout.Button("Save flat earth"))
+            {
+                SaveEarthIsFlat().Forget();
+            }
+            
+            //ShowOrderBox();
+            if (GUILayout.Button("Save person"))
+            {
+                SavePerson().Forget();
+            }
+
             //ShowOrderBox();
             if (GUILayout.Button("Load data"))
             {
@@ -163,11 +184,11 @@ namespace vk_facade.Runtime.components
         {
             try
             {
-                if (await VkBridgeFacade.ShowLeaderBoard()) Debug.Log("Leaderboard shown");
+                if (await VkBridgeFacade.ShowLeaderBoard()) _logger.Log("DEBUG_MENU","Leaderboard shown");
             }
             catch (Exception e)
             {
-                Debug.LogError(e);
+                _logger.LogError("DEBUG_MENU", e);
             }
         }
 
@@ -175,11 +196,11 @@ namespace vk_facade.Runtime.components
         {
             try
             {
-                if (await VkBridgeFacade.ShowLeaderBoard(100)) Debug.Log("Leaderboard shown");
+                if (await VkBridgeFacade.ShowLeaderBoard(100)) _logger.Log("DEBUG_MENU","Leaderboard shown");
             }
             catch (Exception e)
             {
-                Debug.LogError(e);
+                _logger.LogError("DEBUG_MENU", e);
             }
         }
 
@@ -187,11 +208,11 @@ namespace vk_facade.Runtime.components
         {
             try
             {
-                if (await VkBridgeFacade.CheckBannerAd()) Debug.Log("Banner ad is shown");
+                if (await VkBridgeFacade.CheckBannerAd()) _logger.Log("DEBUG_MENU","Banner ad is shown");
             }
             catch (Exception e)
             {
-                Debug.LogError(e);
+                _logger.LogError("DEBUG_MENU", e);
             }
         }
 
@@ -199,11 +220,11 @@ namespace vk_facade.Runtime.components
         {
             try
             {
-                if (await VkBridgeFacade.HideBannerAd()) Debug.Log("Banner ad is hidden");
+                if (await VkBridgeFacade.HideBannerAd()) _logger.Log("DEBUG_MENU","Banner ad is hidden");
             }
             catch (Exception e)
             {
-                Debug.LogError(e);
+                _logger.LogError("DEBUG_MENU", e);
             }
         }
 
@@ -211,11 +232,11 @@ namespace vk_facade.Runtime.components
         {
             try
             {
-                if (await VkBridgeFacade.ShowBannerAd()) Debug.Log("Banner ad is shown");
+                if (await VkBridgeFacade.ShowBannerAd()) _logger.Log("DEBUG_MENU","Banner ad is shown");
             }
             catch (Exception e)
             {
-                Debug.LogError(e);
+                _logger.LogError("DEBUG_MENU", e);
             }
         }
 
@@ -223,11 +244,11 @@ namespace vk_facade.Runtime.components
         {
             try
             {
-                if (await VkBridgeFacade.ShowNativeInterstitialAd()) Debug.Log("Interstitial ad is shown");
+                if (await VkBridgeFacade.ShowNativeInterstitialAd()) _logger.Log("DEBUG_MENU","Interstitial ad is shown");
             }
             catch (Exception e)
             {
-                Debug.LogError(e);
+                _logger.LogError("DEBUG_MENU", e);
             }
         }
 
@@ -235,11 +256,11 @@ namespace vk_facade.Runtime.components
         {
             try
             {
-                if (await VkBridgeFacade.ShowNativeRewardAd()) Debug.Log("Reward ad is shown");
+                if (await VkBridgeFacade.ShowNativeRewardAd()) _logger.Log("DEBUG_MENU","Reward ad is shown");
             }
             catch (Exception e)
             {
-                Debug.LogError(e);
+                _logger.LogError("DEBUG_MENU", e);
             }
         }
 
@@ -247,11 +268,11 @@ namespace vk_facade.Runtime.components
         {
             try
             {
-                if (await VkBridgeFacade.CheckNativeRewardAd()) Debug.Log("Reward ad is ready");
+                if (await VkBridgeFacade.CheckNativeRewardAd()) _logger.Log("DEBUG_MENU","Reward ad is ready");
             }
             catch (Exception e)
             {
-                Debug.LogError(e);
+                _logger.LogError("DEBUG_MENU", e);
             }
         }
 
@@ -259,11 +280,11 @@ namespace vk_facade.Runtime.components
         {
             try
             {
-                if (await VkBridgeFacade.CheckNativeInterstitialAd()) Debug.Log("Interstitial ad is ready");
+                if (await VkBridgeFacade.CheckNativeInterstitialAd()) _logger.Log("DEBUG_MENU","Interstitial ad is ready");
             }
             catch (Exception e)
             {
-                Debug.LogError(e);
+                _logger.LogError("DEBUG_MENU", e);
             }
         }
 
@@ -271,11 +292,11 @@ namespace vk_facade.Runtime.components
         {
             try
             {
-                if (await VkBridgeFacade.InviteFriend()) Debug.Log("InviteFriend shown");
+                if (await VkBridgeFacade.InviteFriend()) _logger.Log("DEBUG_MENU","InviteFriend shown");
             }
             catch (Exception e)
             {
-                Debug.LogError(e);
+                _logger.LogError("DEBUG_MENU", e);
                 throw;
             }
         }
@@ -287,12 +308,12 @@ namespace vk_facade.Runtime.components
             {
                 if (await VkBridgeFacade.RecommendApp())
                 {
-                    Debug.Log("App was recomended");
+                    _logger.Log("DEBUG_MENU","App was recomended");
                 }
             }
             catch (Exception e)
             {
-                Debug.LogError(e);
+                _logger.LogError("DEBUG_MENU", e);
             }
         }
 
@@ -306,7 +327,7 @@ namespace vk_facade.Runtime.components
             }
             catch (Exception e)
             {
-                Debug.LogError(e);
+                _logger.LogError("DEBUG_MENU", e);
                 throw;
             }
         }
@@ -318,7 +339,7 @@ namespace vk_facade.Runtime.components
                 var friends = await VkBridgeFacade.GetFriendList(true);
                 foreach (var friend in friends.users)
                 {
-                    Debug.Log($"FriendFirstName: {friend.first_name}, LastName: {friend.last_name}, ID: {friend.id}");
+                    _logger.Log("DEBUG_MENU",$"FriendFirstName: {friend.first_name}, LastName: {friend.last_name}, ID: {friend.id}");
                 }
             }
             catch (Exception e)
@@ -332,11 +353,11 @@ namespace vk_facade.Runtime.components
             try
             {
                 var userData = await VkBridgeFacade.GetUserData();
-                Debug.Log(userData);
+                _logger.Log("DEBUG_MENU",userData);
             }
             catch (Exception e)
             {
-                Debug.LogError(e);
+                _logger.LogError("DEBUG_MENU", e);
             }
         }
 
@@ -345,36 +366,93 @@ namespace vk_facade.Runtime.components
             try
             {
                 var orderId = await VkBridgeFacade.ShowOrderBox("Товар 1", "100 рублей");
-                Debug.Log($"Order ID: {orderId}");
+                _logger.Log("DEBUG_MENU",$"Order ID: {orderId}");
             }
             catch (Exception e)
             {
-                Debug.LogError(e);
+                _logger.LogError("DEBUG_MENU", e);
                 throw;
             }
         }
 
-        private async UniTaskVoid SaveDataToStorage()
+        private async UniTaskVoid SaveApple()
         {
             try
             {
-                Debug.Log(
-                    "Setting data:[apple, green], [daysInWeek, 7], [earthIsFlat, false], [person, {name=john, age=5, gender=male}]");
+                _logger.Log("DEBUG_MENU",
+                    "Setting data:[apple, green]");
 
-                var jObject = JsonConvert.SerializeObject(new { name = "john", age = 5, gender = "male" });
+                if (await VkBridgeFacade.StorageSet("apple", "green"))
+                    _logger.Log("DEBUG_MENU","Apple is saved");
 
-
-                if (await VkBridgeFacade.StorageSet("apple", "green")) Debug.Log("Apple is saved");
-                if (await VkBridgeFacade.StorageSet("daysInWeek", 7.ToString())) Debug.Log("Days in week is saved");
-                if (await VkBridgeFacade.StorageSet("earthIsFlat", false.ToString()))
-                    Debug.Log("Earth is flat is saved");
-                if (await VkBridgeFacade.StorageSet("person", jObject)) Debug.Log("Person is saved");
-
-                Debug.Log("Data saved to storage");
+                _logger.Log("DEBUG_MENU","Data saved to storage");
             }
             catch (Exception e)
             {
-                Debug.LogError(e);
+                _logger.LogError("DEBUG_MENU", e);
+                throw;
+            }
+        }
+
+        private async UniTaskVoid SaveDaysInWeek()
+        {
+            try
+            {
+                _logger.Log("DEBUG_MENU",
+                    "Setting data:[daysInWeek, 7]");
+
+                if (await VkBridgeFacade.StorageSet("daysInWeek", 7.ToString()))
+                    _logger.Log("DEBUG_MENU","Days in week is saved");
+
+                _logger.Log("DEBUG_MENU","Data saved to storage");
+            }
+            catch (Exception e)
+            {
+                _logger.LogError("DEBUG_MENU", e);
+                throw;
+            }
+        }
+
+        private async UniTaskVoid SaveEarthIsFlat()
+        {
+            try
+            {
+                _logger.Log("DEBUG_MENU",
+                    "Setting data:[earthIsFlat, false]");
+
+                
+                if (await VkBridgeFacade.StorageSet("earthIsFlat", false.ToString()))
+                    _logger.Log("DEBUG_MENU","Earth is flat is saved");
+               
+
+                _logger.Log("DEBUG_MENU","Data saved to storage");
+            }
+            catch (Exception e)
+            {
+                _logger.LogError("DEBUG_MENU", e);
+                throw;
+            }
+        }
+
+        private async UniTaskVoid SavePerson()
+        {
+            try
+            {
+                _logger.Log("DEBUG_MENU",
+                    "Setting data:[person, {name=john, age=5, gender=male}]");
+
+                var jObject = JsonConvert.SerializeObject(new { name = "john", age = 5, gender = "male" });
+
+                _logger.Log("DEBUG_MENU",$"Person as JSON before save: {jObject}");
+                
+                if (await VkBridgeFacade.StorageSet("person", jObject))
+                    _logger.Log("DEBUG_MENU","Person is saved");
+
+                _logger.Log("DEBUG_MENU","Data saved to storage");
+            }
+            catch (Exception e)
+            {
+                _logger.LogError("DEBUG_MENU", e);
                 throw;
             }
         }
@@ -383,29 +461,30 @@ namespace vk_facade.Runtime.components
         {
             try
             {
-                VKStorageData vkStorage = await VkBridgeFacade.StorageGet("apple", "daysInWeek", "earthIsFlat", "person");
+                var vkStorage =
+                    await VkBridgeFacade.StorageGet("apple", "daysInWeek", "earthIsFlat", "person");
 
 
-                Debug.Log($"Apple is: {vkStorage["apple"]}");
-                Debug.Log($"Days in week: {vkStorage["daysInWeek"]}");
-                Debug.Log($"Earth is flat: {vkStorage["earthIsFlat"]}");
-                
+                _logger.Log("DEBUG_MENU",$"Apple is: {vkStorage["apple"]}");
+                _logger.Log("DEBUG_MENU",$"Days in week: {vkStorage["daysInWeek"]}");
+                _logger.Log("DEBUG_MENU",$"Earth is flat: {vkStorage["earthIsFlat"]}");
+
                 try
                 {
                     var person = JsonConvert.DeserializeObject<JObject>(vkStorage["person"]);
 
-                    Debug.Log(
+                    _logger.Log("DEBUG_MENU",
                         $"Person is: Name: {person["name"]}, Age: {person["age"]?.ToObject<int>()}, Gender: {person["gender"]}");
                 }
                 catch (Exception e)
                 {
-                    Debug.LogError(e);
+                    _logger.LogError("DEBUG_MENU", e);
                     throw;
                 }
             }
             catch (Exception e)
             {
-                Debug.LogError(e);
+                _logger.LogError("DEBUG_MENU", e);
                 throw;
             }
         }

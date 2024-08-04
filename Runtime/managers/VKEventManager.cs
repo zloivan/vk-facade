@@ -4,7 +4,6 @@ using System.Runtime.InteropServices;
 using UnityEngine;
 using vk_facade.Runtime.data;
 using vk_facade.Runtime.helpers;
-using ILogger = vk_facade.Runtime.helpers.ILogger;
 
 namespace vk_facade.Runtime.managers
 {
@@ -57,7 +56,7 @@ namespace vk_facade.Runtime.managers
 
         public void TriggerEvent(VKBridgeEventType eventType, VKEventData vkPromiseData)
         {
-            _logger.Log($"TriggerEvent called for {eventType}: [{vkPromiseData}]...");
+            _logger.Log("EVENT_MANAGER",$"TriggerEvent called for {eventType}: [{vkPromiseData}]...");
             
             if (_eventListeners.TryGetValue(eventType, out var listener))
                 listener?.Invoke(vkPromiseData);

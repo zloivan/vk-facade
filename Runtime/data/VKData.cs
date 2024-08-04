@@ -1,11 +1,6 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using UnityEngine;
-using vk_facade.Runtime.helpers;
-using ILogger = vk_facade.Runtime.helpers.ILogger;
 
 namespace vk_facade.Runtime.data
 {

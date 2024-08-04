@@ -4,8 +4,6 @@ using UnityEngine;
 using vk_facade.Runtime.data;
 using vk_facade.Runtime.helpers;
 using vk_facade.Runtime.managers;
-using ILogger = vk_facade.Runtime.helpers.ILogger;
-
 
 namespace vk_facade.Runtime.components
 {
@@ -13,11 +11,11 @@ namespace vk_facade.Runtime.components
     {
         private VKResponseManager _vkResponseManager;
         private VKEventManager _eventManager;
-        private ILogger _logger = new VKBridgeLogger();
+        private readonly ILogger _logger = new VKBridgeLogger();
 
         public void Initialize(VKResponseManager responseManager, VKEventManager eventManager)
         {
-            _logger.Log("Initialized VKMessageReceiver");
+            _logger.Log("MESSAGE_RECEIVER","Initialized VKMessageReceiver");
             _vkResponseManager = responseManager;
             _eventManager = eventManager;
         }
@@ -37,13 +35,13 @@ namespace vk_facade.Runtime.components
         [UsedImplicitly]
         public void ReceiveEvent(string jsonData)
         {
-            _logger.Log($"ReceiveEvent called with json:  {jsonData}");
+            _logger.Log("MESSAGE_RECEIVER",$"ReceiveEvent called with json:  {jsonData}");
             
             var eventObject = JsonUtility.FromJson<VKEvent>(jsonData);
             if (!Enum.TryParse(eventObject.detail.type, out VKBridgeEventType eventType)) 
                 return;
             
-            _logger.Log($"Parsed {eventType} with {eventObject.detail.data}");
+            _logger.Log("MESSAGE_RECEIVER",$"Parsed {eventType} with {eventObject.detail.data}");
             _eventManager.TriggerEvent(eventType, eventObject.detail.data);
         }
 
@@ -52,7 +50,7 @@ namespace vk_facade.Runtime.components
         {
             Debug.Assert(_eventManager!= null, "VKEventManager can not be null!", this);
             
-            _logger.Log("Browser window gained focus");
+            _logger.Log("MESSAGE_RECEIVER","Browser window gained focus");
             _eventManager.TriggerEvent(VKBridgeEventType.FocusChanged, new VKEventData { result = true });
         }
 
@@ -61,7 +59,7 @@ namespace vk_facade.Runtime.components
         {
             Debug.Assert(_eventManager!= null, "VKEventManager can not be null!", this);
             
-            _logger.Log("Browser window lost focus");
+            _logger.Log("MESSAGE_RECEIVER","Browser window lost focus");
             _eventManager.TriggerEvent(VKBridgeEventType.FocusChanged, new VKEventData { result = false });
         }
     }

@@ -5,7 +5,6 @@ using vk_facade.Runtime.components;
 using vk_facade.Runtime.data;
 using vk_facade.Runtime.helpers;
 using vk_facade.Runtime.managers;
-using ILogger = vk_facade.Runtime.helpers.ILogger;
 using Object = UnityEngine.Object;
 
 namespace vk_facade.Runtime
@@ -18,25 +17,25 @@ namespace vk_facade.Runtime
         private static GameObject _vKMenuGameobject;
         private static VKMessageReceiver _vkMessageReceiver;
         private static VKUrlManager _urlManager;
-        private static ILogger _logger = new VKBridgeLogger();
-
+        private static ILogger _logger;
 
         /// <summary>
         /// Инициализация Фасада, вызвать в самом начале, до использования любого из методов
         /// </summary>
         public static void Initialize()
         {
-            _logger.Log("Initializing VkBridgeFacade...");
+            _logger = new VKBridgeLogger();
+            _logger.Log("BRIDGE_FACADE", "Initializing VkBridgeFacade...");
             _vkResponseManager = new VKResponseManager();
-            _logger.Log("Created: VKResponseManager...");
+            _logger.Log("BRIDGE_FACADE", "Created: VKResponseManager...");
             _eventManager = new VKEventManager();
-            _logger.Log("Created: VKEventManager...");
+            _logger.Log("BRIDGE_FACADE", "Created: VKEventManager...");
             _messageReceiverObject = new GameObject("VKMessageReceiver");
             _vkMessageReceiver = _messageReceiverObject.AddComponent<VKMessageReceiver>();
-            _logger.Log("Created: VKMessageReceiver...");
+            _logger.Log("BRIDGE_FACADE", "Created: VKMessageReceiver...");
             _vkMessageReceiver.Initialize(_vkResponseManager, _eventManager);
             _urlManager = new VKUrlManager();
-            _logger.Log("Created: VKUrlManager...");
+            _logger.Log("BRIDGE_FACADE", "Created: VKUrlManager...");
 
             Object.DontDestroyOnLoad(_messageReceiverObject);
 
@@ -119,7 +118,7 @@ namespace vk_facade.Runtime
                     { "use_waterfall", useWaterfall }
                 });
 
-            _logger.Log($"CheckNativeInterstitialAd got result: {vkPromise.result}");
+            _logger.Log("BRIDGE_FACADE", $"CheckNativeInterstitialAd got result: {vkPromise.result}");
             return vkPromise.result;
         }
 
@@ -132,7 +131,7 @@ namespace vk_facade.Runtime
             var vkPromise = await _vkResponseManager.CallVkMethodAsync<VKRequestData>("VKWebAppCheckNativeAds",
                 new VKParams { { "ad_format", "reward" } });
 
-            _logger.Log($"CheckNativeRewardAd got result: {vkPromise.result}");
+            _logger.Log("BRIDGE_FACADE", $"CheckNativeRewardAd got result: {vkPromise.result}");
             return vkPromise.result;
         }
 
@@ -145,7 +144,7 @@ namespace vk_facade.Runtime
             var vkPromise = await _vkResponseManager.CallVkMethodAsync<VKRequestData>("VKWebAppShowNativeAds",
                 new VKParams { { "ad_format", "reward" } });
 
-            _logger.Log($"ShowNativeRewardAd got result: {vkPromise.result}");
+            _logger.Log("BRIDGE_FACADE", $"ShowNativeRewardAd got result: {vkPromise.result}");
             return vkPromise.result;
         }
 
@@ -158,7 +157,7 @@ namespace vk_facade.Runtime
                     { "use_waterfall", useWaterfall }
                 });
 
-            _logger.Log($"ShowNativeInterstitialAd got result: {vkPromise.result}");
+            _logger.Log("BRIDGE_FACADE", $"ShowNativeInterstitialAd got result: {vkPromise.result}");
             return vkPromise.result;
         }
 
@@ -186,7 +185,7 @@ namespace vk_facade.Runtime
             var vkPromise =
                 await _vkResponseManager.CallVkMethodAsync<VKRequestData>("VKWebAppShowBannerAd", parameters);
 
-            _logger.Log($"ShowBannerAd got result: {vkPromise.result}");
+            _logger.Log("BRIDGE_FACADE", $"ShowBannerAd got result: {vkPromise.result}");
             return vkPromise.result;
         }
 
@@ -198,7 +197,7 @@ namespace vk_facade.Runtime
         {
             var vkData = await _vkResponseManager.CallVkMethodAsync<VKRequestData>("VKWebAppHideBannerAd");
 
-            _logger.Log($"HideBannerAd got result: {vkData.result}");
+            _logger.Log("BRIDGE_FACADE", $"HideBannerAd got result: {vkData.result}");
             return vkData.result;
         }
 
@@ -210,7 +209,7 @@ namespace vk_facade.Runtime
         {
             var vkData = await _vkResponseManager.CallVkMethodAsync<VKRequestData>("VKWebAppCheckBannerAd");
 
-            _logger.Log($"CheckBannerAd got result: {vkData.result}");
+            _logger.Log("BRIDGE_FACADE", $"CheckBannerAd got result: {vkData.result}");
             return vkData.result;
         }
 
@@ -223,7 +222,7 @@ namespace vk_facade.Runtime
         {
             var vkData = await _vkResponseManager.CallVkMethodAsync<VKRequestData>("VKWebAppRecommend");
 
-            _logger.Log($"RecommendApp got result: {vkData.result}");
+            _logger.Log("BRIDGE_FACADE", $"RecommendApp got result: {vkData.result}");
             return vkData.result;
         }
 
@@ -244,7 +243,7 @@ namespace vk_facade.Runtime
                 await _vkResponseManager.CallVkMethodAsync<VKRequestData>("VKWebAppShowLeaderBoardBox",
                     vkParams);
 
-            _logger.Log($"ShowLeaderBoard got result: {vkPromise.result}");
+            _logger.Log("BRIDGE_FACADE", $"ShowLeaderBoard got result: {vkPromise.result}");
             return vkPromise.result;
         }
 
@@ -271,7 +270,7 @@ namespace vk_facade.Runtime
             var vkPromise =
                 await _vkResponseManager.CallVkMethodAsync<VKRequestData>("VKWebAppShowWallPostBox", vkParams);
 
-            _logger.Log($"ShowPostOnWall got result: {vkPromise.result}");
+            _logger.Log("BRIDGE_FACADE", $"ShowPostOnWall got result: {vkPromise.result}");
             return vkPromise.result;
         }
 
@@ -292,7 +291,7 @@ namespace vk_facade.Runtime
             var vkPromise =
                 await _vkResponseManager.CallVkMethodAsync<VKOrderData>("VKWebAppShowOrderBox", methodParameters);
 
-            _logger.Log($"ShowOrderBox got result: {vkPromise.success}");
+            _logger.Log("BRIDGE_FACADE", $"ShowOrderBox got result: {vkPromise.success}");
             return vkPromise.success;
         }
 
@@ -311,7 +310,7 @@ namespace vk_facade.Runtime
                 await _vkResponseManager.CallVkMethodAsync<VKSubscriptionData>("VKWebAppShowSubscriptionBox",
                     methodParameters);
 
-            _logger.Log($"ShowSubscriptionBox got result: {vkData}");
+            _logger.Log("BRIDGE_FACADE", $"ShowSubscriptionBox got result: {vkData}");
             return vkData;
         }
 
@@ -330,7 +329,7 @@ namespace vk_facade.Runtime
             var vkData =
                 await _vkResponseManager.CallVkMethodAsync<VKFriendsData>("VKWebAppGetFriends", methodParameters);
 
-            _logger.Log($"GetFriendList got result: {vkData}");
+            _logger.Log("BRIDGE_FACADE", $"GetFriendList got result: {vkData}");
             return vkData;
         }
 
@@ -349,7 +348,7 @@ namespace vk_facade.Runtime
             var vkData =
                 await _vkResponseManager.CallVkMethodAsync<VKUserData>("VKWebAppGetUserInfo", methodParameters);
 
-            _logger.Log($"GetUserData got result: {vkData}");
+            _logger.Log("BRIDGE_FACADE", $"GetUserData got result: {vkData}");
             return vkData;
         }
 
@@ -377,7 +376,7 @@ namespace vk_facade.Runtime
             var vkData =
                 await _vkResponseManager.CallVkMethodAsync<VKLaunchParams>("VKWebAppGetLaunchParams");
 
-            _logger.Log($"GetLaunchParams got result: {vkData}");
+            _logger.Log("BRIDGE_FACADE", $"GetLaunchParams got result: {vkData}");
             return vkData;
         }
 
@@ -385,7 +384,7 @@ namespace vk_facade.Runtime
         {
             var vkLaunchParams = _urlManager.GetLaunchParams();
 
-            _logger.Log($"GetLaunchParams got result: {vkLaunchParams}");
+            _logger.Log("BRIDGE_FACADE", $"GetLaunchParams got result: {vkLaunchParams}");
             return vkLaunchParams;
         }
 
@@ -397,7 +396,7 @@ namespace vk_facade.Runtime
         {
             var result = GetLaunchParams();
 
-            _logger.Log($"GetLanguageCode got result: {result}");
+            _logger.Log("BRIDGE_FACADE", $"GetLanguageCode got result: {result}");
             return LaunchParamsHelper.ConvertToLanguage(result.Language);
         }
 
@@ -416,7 +415,7 @@ namespace vk_facade.Runtime
             var vkData =
                 await _vkResponseManager.CallVkMethodAsync<VKStorageData>("VKWebAppStorageGet", vkParams);
 
-            _logger.Log($"StorageGet got result: {vkData}");
+            _logger.Log("BRIDGE_FACADE", $"StorageGet got result: {vkData}");
             return vkData;
         }
 
@@ -433,11 +432,11 @@ namespace vk_facade.Runtime
                 { "key", key },
                 { "value", value }
             };
-            
+
             var vkData =
                 await _vkResponseManager.CallVkMethodAsync<VKRequestData>("VKWebAppStorageSet", vkParams);
 
-            _logger.Log($"StorageSet got result: {vkData.result}");
+            _logger.Log("BRIDGE_FACADE", $"StorageSet got result: {vkData.result}");
             return vkData.result;
         }
 
@@ -446,7 +445,7 @@ namespace vk_facade.Runtime
             var vkData =
                 await _vkResponseManager.CallVkMethodAsync<VKStorageKeys>("VKWebAppStorageGetKeys");
 
-            _logger.Log($"StorageGetKeys got result: {vkData}");
+            _logger.Log("BRIDGE_FACADE", $"StorageGetKeys got result: {vkData}");
             return vkData;
         }
 
@@ -457,20 +456,21 @@ namespace vk_facade.Runtime
         {
             if (_messageReceiverObject != null)
             {
-                Object.Destroy(_messageReceiverObject);
+                Object.DestroyImmediate(_messageReceiverObject);
             }
 
             if (_vKMenuGameobject != null)
             {
-                Object.Destroy(_vKMenuGameobject);
+                Object.DestroyImmediate(_vKMenuGameobject);
             }
 
-            _vKMenuGameobject = null;
             _vkResponseManager = null;
             _eventManager = null;
             _messageReceiverObject = null;
+            _vKMenuGameobject = null;
             _vkMessageReceiver = null;
-            _logger = null;
+            _urlManager = null;
+            _logger = new VKBridgeLogger();
         }
 
         /// <summary>
