@@ -17,12 +17,23 @@ namespace vk_facade.Runtime
         private static GameObject _vKMenuGameobject;
         private static VKMessageReceiver _vkMessageReceiver;
         private static VKUrlManager _urlManager;
+        private static VKStorageManager _storageManager;
         private static ILogger _logger;
 
+        public static VKStorageManager Storage => _storageManager;
+        
         /// <summary>
         /// Инициализация Фасада, вызвать в самом начале, до использования любого из методов
         /// </summary>
         public static void Initialize()
+        {
+            InitializeAsync().Forget();
+        }
+
+        /// <summary>
+        /// Инициализация Фасада, вызвать в самом начале, до использования любого из методов
+        /// </summary>
+        public static async UniTask InitializeAsync()
         {
             _logger = new VKBridgeLogger();
             _logger.Log("BRIDGE_FACADE", "Initializing VkBridgeFacade...");
@@ -36,10 +47,15 @@ namespace vk_facade.Runtime
             _vkMessageReceiver.Initialize(_vkResponseManager, _eventManager);
             _urlManager = new VKUrlManager();
             _logger.Log("BRIDGE_FACADE", "Created: VKUrlManager...");
-
+            _storageManager = new VKStorageManager();
+            _logger.Log("BRIDGE_FACADE", "Created: VKStorageManager");
+            
             Object.DontDestroyOnLoad(_messageReceiverObject);
 
             SpawnDebugMenu();
+            
+            await VkBridgeInit();
+            await _storageManager.Load();
         }
 
         private static void SpawnDebugMenu()

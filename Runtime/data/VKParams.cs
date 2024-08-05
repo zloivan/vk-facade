@@ -25,6 +25,9 @@ namespace vk_facade.Runtime.data
 
         public string GetParams()
         {
+            if (Params.Count == 0) return "{}";
+            
+            
             var result = new JObject();
             
             foreach (var param in Params)
