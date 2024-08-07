@@ -14,14 +14,14 @@ namespace vk_facade.Runtime
         private static VKResponseManager _vkResponseManager;
         private static VKEventManager _eventManager;
         private static GameObject _messageReceiverObject;
-        private static GameObject _vKMenuGameobject;
+        private static GameObject _vKMenuGameObject;
         private static VKMessageReceiver _vkMessageReceiver;
         private static VKUrlManager _urlManager;
         private static VKStorageManager _storageManager;
         private static ILogger _logger;
 
         public static VKStorageManager Storage => _storageManager;
-        
+
         /// <summary>
         /// Инициализация Фасада, вызвать в самом начале, до использования любого из методов
         /// </summary>
@@ -49,21 +49,21 @@ namespace vk_facade.Runtime
             _logger.Log("BRIDGE_FACADE", "Created: VKUrlManager...");
             _storageManager = new VKStorageManager();
             _logger.Log("BRIDGE_FACADE", "Created: VKStorageManager");
-            
+
             Object.DontDestroyOnLoad(_messageReceiverObject);
 
             SpawnDebugMenu();
-            
+
             await VkBridgeInit();
             await _storageManager.Load();
         }
 
         private static void SpawnDebugMenu()
         {
-            _vKMenuGameobject = new GameObject("VKDebugMenu");
-            _vKMenuGameobject.AddComponent<VKBridgeDebugMenu>();
-            Object.DontDestroyOnLoad(_vKMenuGameobject);
-            _vKMenuGameobject.SetActive(false);
+            _vKMenuGameObject = new GameObject("VKDebugMenu");
+            _vKMenuGameObject.AddComponent<VKBridgeDebugMenu>();
+            Object.DontDestroyOnLoad(_vKMenuGameObject);
+            _vKMenuGameObject.SetActive(false);
         }
 
         /// <summary>
@@ -108,14 +108,12 @@ namespace vk_facade.Runtime
         /// <returns>Успешно ли прошел запрос</returns>
         public static async UniTask<bool> InviteFriend(string inviteRequestKey = null)
         {
-            var methodParameters = new VKParams();
-            if (string.IsNullOrEmpty(inviteRequestKey))
-            {
-                methodParameters.Add("requestKey", inviteRequestKey);
-            }
-
             var vkPromiseData =
-                await _vkResponseManager.CallVkMethodAsync<VKRequestData>("VKWebAppShowInviteBox", methodParameters);
+                await _vkResponseManager.CallVkMethodAsync<VKRequestData>("VKWebAppShowInviteBox",
+                    new VKParams
+                    {
+                        { "requestKey", inviteRequestKey }
+                    });
 
             return vkPromiseData.result;
         }
@@ -145,7 +143,10 @@ namespace vk_facade.Runtime
         public static async UniTask<bool> CheckNativeRewardAd()
         {
             var vkPromise = await _vkResponseManager.CallVkMethodAsync<VKRequestData>("VKWebAppCheckNativeAds",
-                new VKParams { { "ad_format", "reward" } });
+                new VKParams
+                {
+                    { "ad_format", "reward" }
+                });
 
             _logger.Log("BRIDGE_FACADE", $"CheckNativeRewardAd got result: {vkPromise.result}");
             return vkPromise.result;
@@ -158,7 +159,10 @@ namespace vk_facade.Runtime
         public static async UniTask<bool> ShowNativeRewardAd()
         {
             var vkPromise = await _vkResponseManager.CallVkMethodAsync<VKRequestData>("VKWebAppShowNativeAds",
-                new VKParams { { "ad_format", "reward" } });
+                new VKParams
+                {
+                    { "ad_format", "reward" }
+                });
 
             _logger.Log("BRIDGE_FACADE", $"ShowNativeRewardAd got result: {vkPromise.result}");
             return vkPromise.result;
@@ -236,7 +240,7 @@ namespace vk_facade.Runtime
         /// <returns>Успешно ли прошел запрос</returns>
         public static async UniTask<bool> RecommendApp()
         {
-            var vkData = await _vkResponseManager.CallVkMethodAsync<VKRequestData>("VKWebAppRecommend");
+            VKRequestData vkData = await _vkResponseManager.CallVkMethodAsync<VKRequestData>("VKWebAppRecommend");
 
             _logger.Log("BRIDGE_FACADE", $"RecommendApp got result: {vkData.result}");
             return vkData.result;
@@ -247,17 +251,14 @@ namespace vk_facade.Runtime
         /// </summary>
         /// <param name="result">Если не отправлять результат, покажет тещий счет игрока, иначе поменяет на новый</param>
         /// <returns>Успешно ли прошел запрос</returns>
-        public static async UniTask<bool> ShowLeaderBoard(int result = -1)
+        public static async UniTask<bool> ShowLeaderBoard(int? result = null)
         {
-            var vkParams = new VKParams();
-            if (result != -1)
-            {
-                vkParams.Add("user_result", result);
-            }
-
             var vkPromise =
                 await _vkResponseManager.CallVkMethodAsync<VKRequestData>("VKWebAppShowLeaderBoardBox",
-                    vkParams);
+                    new VKParams
+                    {
+                        { "user_result", result }
+                    });
 
             _logger.Log("BRIDGE_FACADE", $"ShowLeaderBoard got result: {vkPromise.result}");
             return vkPromise.result;
@@ -272,19 +273,16 @@ namespace vk_facade.Runtime
         /// <param name="friendsOnly">Опубликовать только для друзей</param>
         /// <returns>Успешно ли прошел запрос</returns>
         public static async UniTask<bool> PublishPostOnWall(string postMessage,
-            string postAttachments = "",
+            string postAttachments = null,
             bool friendsOnly = true)
         {
-            var vkParams = new VKParams
-            {
-                { "message", postMessage },
-                { "friends_only", friendsOnly }
-            };
-
-            if (!string.IsNullOrEmpty(postAttachments)) vkParams.Add("attachments", postAttachments);
-
             var vkPromise =
-                await _vkResponseManager.CallVkMethodAsync<VKRequestData>("VKWebAppShowWallPostBox", vkParams);
+                await _vkResponseManager.CallVkMethodAsync<VKRequestData>("VKWebAppShowWallPostBox", new VKParams
+                {
+                    { "message", postMessage },
+                    { "friends_only", friendsOnly },
+                    { "attachments", postAttachments }
+                });
 
             _logger.Log("BRIDGE_FACADE", $"ShowPostOnWall got result: {vkPromise.result}");
             return vkPromise.result;
@@ -298,14 +296,12 @@ namespace vk_facade.Runtime
         /// <returns></returns>
         public static async UniTask<bool> ShowOrderBox(string itemType, string itemId)
         {
-            var methodParameters = new VKParams
-            {
-                { "type", itemType },
-                { "item", itemId }
-            };
-
             var vkPromise =
-                await _vkResponseManager.CallVkMethodAsync<VKOrderData>("VKWebAppShowOrderBox", methodParameters);
+                await _vkResponseManager.CallVkMethodAsync<VKOrderData>("VKWebAppShowOrderBox", new VKParams
+                {
+                    { "type", itemType },
+                    { "item", itemId }
+                });
 
             _logger.Log("BRIDGE_FACADE", $"ShowOrderBox got result: {vkPromise.success}");
             return vkPromise.success;
@@ -315,16 +311,13 @@ namespace vk_facade.Runtime
             string subscriptionItem,
             string subscriptionId)
         {
-            var methodParameters = new VKParams
-            {
-                { "action", Enum.GetName(typeof(SubscriptionAction), action) },
-                { "item", subscriptionItem },
-                { "subscription_id", subscriptionId }
-            };
-
-            var vkData =
-                await _vkResponseManager.CallVkMethodAsync<VKSubscriptionData>("VKWebAppShowSubscriptionBox",
-                    methodParameters);
+            var vkData = await _vkResponseManager.CallVkMethodAsync<VKSubscriptionData>("VKWebAppShowSubscriptionBox",
+                    new VKParams
+                    {
+                        { "action", Enum.GetName(typeof(SubscriptionAction), action) },
+                        { "item", subscriptionItem },
+                        { "subscription_id", subscriptionId }
+                    });
 
             _logger.Log("BRIDGE_FACADE", $"ShowSubscriptionBox got result: {vkData}");
             return vkData;
@@ -485,17 +478,18 @@ namespace vk_facade.Runtime
                 Object.DestroyImmediate(_messageReceiverObject);
             }
 
-            if (_vKMenuGameobject != null)
+            if (_vKMenuGameObject != null)
             {
-                Object.DestroyImmediate(_vKMenuGameobject);
+                Object.DestroyImmediate(_vKMenuGameObject);
             }
 
             _vkResponseManager = null;
             _eventManager = null;
             _messageReceiverObject = null;
-            _vKMenuGameobject = null;
+            _vKMenuGameObject = null;
             _vkMessageReceiver = null;
             _urlManager = null;
+            _storageManager = null;
             _logger = new VKBridgeLogger();
         }
 
@@ -504,7 +498,7 @@ namespace vk_facade.Runtime
         /// </summary>
         public static void ShowDebug()
         {
-            _vKMenuGameobject.SetActive(true);
+            _vKMenuGameObject.SetActive(true);
         }
     }
 }

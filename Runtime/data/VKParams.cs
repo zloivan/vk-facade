@@ -10,7 +10,19 @@ namespace vk_facade.Runtime.data
 
         public void Add(string paramName, object paramValue)
         {
-            Params[paramName] = paramValue;
+            if (paramValue != null)
+            {
+                Params[paramName] = paramValue;
+            }
+        }
+
+        // This method allows the collection initializer to work
+        public void Add(KeyValuePair<string, object> kvp)
+        {
+            if (kvp.Value is not null)
+            {
+                Params[kvp.Key] = kvp.Value;
+            }
         }
 
         public IEnumerator<KeyValuePair<string, object>> GetEnumerator()
@@ -26,10 +38,9 @@ namespace vk_facade.Runtime.data
         public string GetParams()
         {
             if (Params.Count == 0) return "{}";
-            
-            
+
             var result = new JObject();
-            
+
             foreach (var param in Params)
             {
                 result[param.Key] = JToken.FromObject(param.Value);
