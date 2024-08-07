@@ -85,7 +85,7 @@ namespace vk_facade.Runtime.managers
         }
 
         [PublicAPI]
-        public void SetString(string key, string value)
+        public void SetString(string key, string value = "")
         {
             if (string.IsNullOrWhiteSpace(key))
             {
@@ -135,6 +135,9 @@ namespace vk_facade.Runtime.managers
         }
 
         [PublicAPI]
+        public string GetString(string key) => GetString(key, "");
+
+        [PublicAPI]
         public int GetInt(string key, int defaultValue)
         {
             if (string.IsNullOrWhiteSpace(key))
@@ -154,6 +157,10 @@ namespace vk_facade.Runtime.managers
             _loadedStorage[key] = defaultValue.ToString();
             return defaultValue;
         }
+
+        [PublicAPI]
+        public int GetInt(string key) => GetInt(key, 0);
+
 
         [PublicAPI]
         public float GetFloat(string key, float defaultValue)
@@ -176,6 +183,9 @@ namespace vk_facade.Runtime.managers
             _loadedStorage[key] = defaultValue.ToString(CultureInfo.InvariantCulture);
             return defaultValue;
         }
+
+        [PublicAPI]
+        public float GetFloat(string key) => GetFloat(key, 0f);
 
         [PublicAPI]
         public void DeleteAll()
