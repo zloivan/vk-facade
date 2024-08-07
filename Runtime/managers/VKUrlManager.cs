@@ -18,7 +18,9 @@ namespace vk_facade.Runtime.managers
         public VKLaunchParams GetLaunchParams()
         {
             if (Application.isEditor)
+            {
                 return new VKLaunchParams();
+            }
             
             _logger.Log("URL_MANAGER","GetLaunchParams called...");
             var url = Marshal.PtrToStringAnsi(UnityVKBridge_GetWindowLocationHref());

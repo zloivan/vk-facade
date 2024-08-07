@@ -20,6 +20,11 @@ namespace vk_facade.Runtime.managers
 
         internal async UniTask Load()
         {
+            if (Application.isEditor)
+            {
+                return;
+            }
+
             try
             {
                 _logger.Log("Loading from VK...");
@@ -55,6 +60,12 @@ namespace vk_facade.Runtime.managers
 
         public async UniTask Save()
         {
+            if (Application.isEditor)
+            {
+                PlayerPrefs.Save();
+                return;
+            }
+
             try
             {
                 _logger.Log("Saving to VK...");
@@ -87,6 +98,12 @@ namespace vk_facade.Runtime.managers
         [PublicAPI]
         public void SetString(string key, string value = "")
         {
+            if (Application.isEditor)
+            {
+                PlayerPrefs.SetString(key, value);
+                return;
+            }
+
             if (string.IsNullOrWhiteSpace(key))
             {
                 _logger.LogWarning("VK_STORAGE_MANAGER", "Key cannot be null or whitespace.");
@@ -102,21 +119,18 @@ namespace vk_facade.Runtime.managers
             }
         }
 
-        [PublicAPI]
-        public void SetInt(string key, int value)
-        {
-            SetString(key, value.ToString());
-        }
 
         [PublicAPI]
-        public void SetFloat(string key, float value)
-        {
-            SetString(key, value.ToString(CultureInfo.InvariantCulture));
-        }
+        public void SetFloat(string key, float value) => SetString(key, value.ToString(CultureInfo.InvariantCulture));
+
+        [PublicAPI]
+        public void SetInt(string key, int value) => SetString(key, value.ToString());
 
         [PublicAPI]
         public string GetString(string key, string defaultValue)
         {
+            if (Application.isEditor) return PlayerPrefs.GetString(key, defaultValue);
+            
             if (string.IsNullOrWhiteSpace(key))
             {
                 _logger.LogWarning("VK_STORAGE_MANAGER", "Key cannot be null or whitespace.");
@@ -140,6 +154,8 @@ namespace vk_facade.Runtime.managers
         [PublicAPI]
         public int GetInt(string key, int defaultValue)
         {
+            if (Application.isEditor) return PlayerPrefs.GetInt(key, defaultValue);
+            
             if (string.IsNullOrWhiteSpace(key))
             {
                 _logger.LogWarning("VK_STORAGE_MANAGER", "Key cannot be null or whitespace.");
@@ -161,10 +177,17 @@ namespace vk_facade.Runtime.managers
         [PublicAPI]
         public int GetInt(string key) => GetInt(key, 0);
 
-
+        /// <summary>
+        /// Get float value in CultureInfo.InvariantCulture
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="defaultValue"></param>
+        /// <returns></returns>
         [PublicAPI]
         public float GetFloat(string key, float defaultValue)
         {
+            
+            
             if (string.IsNullOrWhiteSpace(key))
             {
                 _logger.LogWarning("VK_STORAGE_MANAGER", "Key cannot be null or whitespace.");
@@ -190,6 +213,12 @@ namespace vk_facade.Runtime.managers
         [PublicAPI]
         public void DeleteAll()
         {
+            if (Application.isEditor)
+            {
+                 PlayerPrefs.DeleteAll();
+                 return;
+            }
+            
             _logger.Log("Deleting all keys from storage...");
             foreach (var key in _loadedStorage.Keys)
             {
@@ -203,6 +232,12 @@ namespace vk_facade.Runtime.managers
         [PublicAPI]
         public void DeleteKey(string key)
         {
+            if (Application.isEditor)
+            {
+                PlayerPrefs.DeleteKey(key);
+                return;
+            }
+            
             if (string.IsNullOrWhiteSpace(key))
             {
                 _logger.LogWarning("VK_STORAGE_MANAGER", "Key cannot be null or whitespace.");
@@ -224,6 +259,9 @@ namespace vk_facade.Runtime.managers
         [PublicAPI]
         public bool HasKey(string key)
         {
+            if (Application.isEditor) return PlayerPrefs.HasKey(key);
+            
+            
             if (string.IsNullOrWhiteSpace(key))
             {
                 _logger.LogWarning("VK_STORAGE_MANAGER", "Key cannot be null or whitespace.");

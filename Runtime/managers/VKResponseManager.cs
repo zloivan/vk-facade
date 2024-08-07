@@ -60,55 +60,56 @@ namespace vk_facade.Runtime.managers
 
         public void HandlePromiseResponse(string jsonResponse)
         {
-            _logger.Log("RESPONSE_MANAGER", $"GOT RESPONSE FROM PROMISE JSON: {jsonResponse}");
+            _logger.Log("RESPONSE_MANAGER", $"Received JSON response: {jsonResponse}");
             VKPromiseResponse response;
             try
             {
                 response = JsonConvert.DeserializeObject<VKPromiseResponse>(jsonResponse);
-                _logger.Log("RESPONSE_MANAGER", $"Deserialized by newton RESPONSE FROM PROMISE data: {response.data}");
-                _logger.Log("RESPONSE_MANAGER",
-                    $"Deserialized by newton RESPONSE FROM PROMISE error: {response.error}");
-                _logger.Log("RESPONSE_MANAGER",
-                    $"Deserialized by newton RESPONSE FROM PROMISE error: {response.method}");
+                _logger.Log("RESPONSE_MANAGER", $"Deserialized response - Method: {response.method}, Data: {response.data}, Error: {response.error}");
             }
             catch (JsonReaderException ex)
             {
-                _logger.LogError("RESPONSE_MANAGER", $"JsonReaderException: {ex.Message}");
+                _logger.LogError("RESPONSE_MANAGER", $"Failed to deserialize JSON response. Error: {ex.Message}");
                 throw;
             }
 
             if (!_promises.TryGetValue(response.method, out var promise))
+            {
+                _logger.LogWarning("RESPONSE_MANAGER", $"No promise found for method: {response.method}");
                 return;
+            }
 
             promise.SetResult(response.data?.ToString());
             _promises.Remove(response.method);
+            _logger.Log("RESPONSE_MANAGER", $"Resolved and removed promise for method: {response.method}");
         }
 
         public void HandleErrorResponse(string jsonResponse)
         {
-            _logger.Log("RESPONSE_MANAGER", $"GOT RESPONSE FROM PROMISE JSON: {jsonResponse}");
+            _logger.Log("RESPONSE_MANAGER", $"Received JSON response: {jsonResponse}");
             VKPromiseResponse response;
             try
             {
                 response = JsonConvert.DeserializeObject<VKPromiseResponse>(jsonResponse);
-                _logger.Log("RESPONSE_MANAGER", $"Deserialized by newton RESPONSE FROM PROMISE data: {response.data}");
-                _logger.Log("RESPONSE_MANAGER",
-                    $"Deserialized by newton RESPONSE FROM PROMISE error: {response.error}");
-                _logger.Log("RESPONSE_MANAGER",
-                    $"Deserialized by newton RESPONSE FROM PROMISE error: {response.method}");
+                _logger.Log("RESPONSE_MANAGER", $"Deserialized response - Method: {response.method}, Data: {response.data}, Error: {response.error}");
             }
-            catch (JsonReaderException exception)
+            catch (JsonReaderException ex)
             {
-                _logger.LogError("RESPONSE_MANAGER", $"JsonReaderException: {exception.Message}");
+                _logger.LogError("RESPONSE_MANAGER", $"Failed to deserialize JSON response. Error: {ex.Message}");
                 throw;
             }
 
             if (!_promises.TryGetValue(response.method, out var promise))
+            {
+                _logger.LogWarning("RESPONSE_MANAGER", $"No promise found for method: {response.method}");
                 return;
+            }
 
             promise.SetException(response.error?.ToString());
             _promises.Remove(response.method);
+            _logger.Log("RESPONSE_MANAGER", $"Set exception and removed promise for method: {response.method}");
         }
+
 
         public void ShowAlert(string message)
         {
