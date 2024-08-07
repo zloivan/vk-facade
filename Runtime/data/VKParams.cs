@@ -19,7 +19,7 @@ namespace vk_facade.Runtime.data
         // This method allows the collection initializer to work
         public void Add(KeyValuePair<string, object> kvp)
         {
-            if (kvp.Value is not null)
+            if (kvp.Value != null)
             {
                 Params[kvp.Key] = kvp.Value;
             }
