@@ -15,7 +15,7 @@ namespace vk_facade.Runtime.managers
         private readonly ILogger _logger = new VKBridgeLogger();
 
         [DllImport("__Internal")]
-        private static extern void UnityVKBridge_SendMessage(string methodName, string parameters);
+        private static extern void UnityVKBridge_SendMessage(string methodName,string uniqueId, string parameters);
 
         [DllImport("__Internal")]
         private static extern void UnityVKBridge_Alert(string message);
@@ -39,11 +39,14 @@ namespace vk_facade.Runtime.managers
         public async UniTask<T> CallVkMethodAsync<T>(string methodName, VKParams parameters = default) where T : VKData
         {
             var vkPromise = new VKPromise<T>();
-            _promises[methodName] = vkPromise;
+            var uniqueId = Guid.NewGuid().ToString();
+            
+            
+            _promises[uniqueId] = vkPromise;
 
             if (!Application.isEditor)
             {
-                UnityVKBridge_SendMessage(methodName, parameters?.GetParams());
+                UnityVKBridge_SendMessage(methodName, uniqueId, parameters?.GetParams());
             }
             else
             {
@@ -53,7 +56,7 @@ namespace vk_facade.Runtime.managers
                 vkPromise.CompletionSource.TrySetResult(defaultInstance);
             }
 
-            _logger.Log("RESPONSE_MANAGER", $"VKBridge.send<T>({methodName}, {parameters?.GetParams()}) called");
+            _logger.Log("RESPONSE_MANAGER", $"VKBridge.send<T>({methodName}, {parameters?.GetParams()}) called with ID: {uniqueId}");
 
             return await vkPromise.CompletionSource.Task;
         }
@@ -65,7 +68,7 @@ namespace vk_facade.Runtime.managers
             try
             {
                 response = JsonConvert.DeserializeObject<VKPromiseResponse>(jsonResponse);
-                _logger.Log("RESPONSE_MANAGER", $"Deserialized response - Method: {response.method}, Data: {response.data}, Error: {response.error}");
+                _logger.Log("RESPONSE_MANAGER", $"Deserialized response - RequestId: {response.requestId}, Method: {response.method}, Data: {response.data}, Error: {response.error}");
             }
             catch (JsonReaderException ex)
             {
@@ -73,25 +76,25 @@ namespace vk_facade.Runtime.managers
                 throw;
             }
 
-            if (!_promises.TryGetValue(response.method, out var promise))
+            if (!_promises.TryGetValue(response.requestId, out var promise))
             {
-                _logger.LogWarning("RESPONSE_MANAGER", $"No promise found for method: {response.method}");
+                _logger.LogWarning("RESPONSE_MANAGER", $"No promise found for RequestId: {response.requestId}");
                 return;
             }
 
             promise.SetResult(response.data?.ToString());
-            _promises.Remove(response.method);
-            _logger.Log("RESPONSE_MANAGER", $"Resolved and removed promise for method: {response.method}");
+            _promises.Remove(response.requestId);
+            _logger.Log("RESPONSE_MANAGER", $"Resolved and removed promise for RequestId: {response.requestId}");
         }
 
         public void HandleErrorResponse(string jsonResponse)
         {
-            _logger.Log("RESPONSE_MANAGER", $"Received JSON response: {jsonResponse}");
+            _logger.LogWarning("RESPONSE_MANAGER", $"Handling error response: {jsonResponse}");
             VKPromiseResponse response;
             try
             {
                 response = JsonConvert.DeserializeObject<VKPromiseResponse>(jsonResponse);
-                _logger.Log("RESPONSE_MANAGER", $"Deserialized response - Method: {response.method}, Data: {response.data}, Error: {response.error}");
+                _logger.Log("RESPONSE_MANAGER", $"Deserialized response - RequestId: {response.requestId}, Method: {response.method}, Data: {response.data}, Error: {response.error}");
             }
             catch (JsonReaderException ex)
             {
@@ -99,15 +102,15 @@ namespace vk_facade.Runtime.managers
                 throw;
             }
 
-            if (!_promises.TryGetValue(response.method, out var promise))
+            if (!_promises.TryGetValue(response.requestId, out var promise))
             {
-                _logger.LogWarning("RESPONSE_MANAGER", $"No promise found for method: {response.method}");
+                _logger.LogWarning("RESPONSE_MANAGER", $"No promise found for RequestId: {response.requestId}");
                 return;
             }
 
             promise.SetException(response.error?.ToString());
-            _promises.Remove(response.method);
-            _logger.Log("RESPONSE_MANAGER", $"Set exception and removed promise for method: {response.method}");
+            _promises.Remove(response.requestId);
+            _logger.Log("RESPONSE_MANAGER", $"Set exception and removed promise for RequestId: {response.requestId}");
         }
 
 

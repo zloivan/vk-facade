@@ -1,35 +1,37 @@
 enableLogging = false;
 mergeInto(LibraryManager.library, {
-    UnityVKBridge_SendMessage: function(methodNamePtr, paramsPtr) {
+    UnityVKBridge_SendMessage: function(methodNamePtr, requestIdPtr, paramsPtr) {
         var methodName = UTF8ToString(methodNamePtr);
+        var requestId = UTF8ToString(requestIdPtr);
         var params = UTF8ToString(paramsPtr);
 
         try {
-            if (enableLogging) {console.log('Method name: ',methodName);}
-            if (enableLogging) {console.log('Params before parse: ',params);}
+            if (enableLogging) {console.log('JS:::Method name: ',methodName);}
+            if (enableLogging) {console.log('JS:::Request ID: ', requestId);}
+            if (enableLogging) {console.log('JS:::Params before parse: ',params);}
             var parsedParams = params ? JSON.parse(params) : {};
-            if (enableLogging) {console.log('Params after parse: ',parsedParams);}
+            if (enableLogging) {console.log('JS:::Params after parse: ',parsedParams);}
             if (typeof vkBridge !== 'undefined') {
                 vkBridge.send(methodName, parsedParams)
                     .then(function(data) {
-                        if (enableLogging) {console.log('Got inside then: ',data);}
-                        var dataStr = JSON.stringify({ method: methodName, data: data });
-                        if (enableLogging) {console.log('Data after parse : ',dataStr);}
+                        if (enableLogging) {console.log('JS:::Got inside then: ',data);}
+                        var dataStr = JSON.stringify({ requestId: requestId, method: methodName, data: data });
+                        if (enableLogging) {console.log('JS:::Data after parse : ',dataStr);}
                         gameInstance.SendMessage('VKMessageReceiver', 'ReceivePromise', dataStr);
-                        if (enableLogging) {console.log('Send message to unity...');}
+                        if (enableLogging) {console.log('JS:::Send message to unity...');}
                     })
                     .catch(function(error) {
-                        if (enableLogging) {console.log('Got inside error: ',error);}
-                        var errorStr = JSON.stringify({ method: methodName, error: error });
-                        console.log('Error after parse: ',errorStr);
+                        if (enableLogging) {console.log('JS:::Got inside error: ',error);}
+                        var errorStr = JSON.stringify({ requestId: requestId, method: methodName, error: error });
+                        console.log('JS:::Error after parse: ',errorStr);
                         gameInstance.SendMessage('VKMessageReceiver', 'ReceiveError', errorStr);
-                        if (enableLogging) {console.log('Send message to unity...');}
+                        if (enableLogging) {console.log('JS:::JS:::Send message to unity...');}
                     });
             } else {
-                console.error('vkBridge is not defined. Make sure vkBridge is loaded.');
+                console.error('JS:::vkBridge is not defined. Make sure vkBridge is loaded.');
             }
         } catch (e) {
-            console.error('JSON parse error:', e);
+            console.error('JS:::JSON parse error:', e);
         }
     },
 
@@ -41,11 +43,11 @@ mergeInto(LibraryManager.library, {
         if (typeof vkBridge !== 'undefined') {
             vkBridge.subscribe(function(event) {
                 var eventStr = JSON.stringify(event);
-                if (enableLogging) {console.log('SendMessage called... for ReceiveEvent');}
+                if (enableLogging) {console.log('JS:::SendMessage called... for ReceiveEvent');}
                 gameInstance.SendMessage('VKMessageReceiver', 'ReceiveEvent', eventStr);
             });
         } else {
-            console.error('vkBridge is not defined. Make sure vkBridge is loaded.');
+            console.error('JS:::vkBridge is not defined. Make sure vkBridge is loaded.');
         }
     },
 
@@ -84,12 +86,12 @@ mergeInto(LibraryManager.library, {
                 }
             });
         } else {
-            console.error('vkBridge is not defined. Make sure vkBridge is loaded.');
+            console.error('JS:::vkBridge is not defined. Make sure vkBridge is loaded.');
         }
     },
 
     UnityVKBridge_SetLogging: function (value) {
         enableLogging = value !== 0;
-        console.log('Logging enabled: ' + enableLogging);
+        console.log('JS:::Logging enabled: ' + enableLogging);
     },
 });
