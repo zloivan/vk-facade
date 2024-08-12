@@ -414,7 +414,7 @@ namespace vk_facade.Runtime
         /// </summary>
         /// <param name="parameters">Список ключей по которым нужно вернуть значения</param>
         /// <returns>Список ключ - значение, обернутые в <see cref="VKStorageData"/></returns>
-        public static async UniTask<VKStorageData> StorageGet(params string[] parameters)
+        internal static async UniTask<VKStorageData> StorageGet(params string[] parameters)
         {
             var vkParams = new VKParams
             {
@@ -434,7 +434,7 @@ namespace vk_facade.Runtime
         /// <param name="key">Ключ по которому забирается значение</param>
         /// <param name="value">Если тут пустая строка, тогда значение удаляется из хранилища</param>
         /// <returns>Успешный ли запрос</returns>
-        public static async UniTask<bool> StorageSet(string key, string value)
+        internal static async UniTask<bool> StorageSet(string key, string value)
         {
             _logger.Log("BRIDGE_FACADE", $"StorageSet method called with [{key},{value}]...");
 
@@ -453,7 +453,7 @@ namespace vk_facade.Runtime
             return vkData.result;
         }
 
-        public static async UniTask<VKStorageKeys> StorageGetKeys(int numKeyNamesToGet, int offset)
+        internal static async UniTask<VKStorageKeys> StorageGetKeys(int numKeyNamesToGet, int offset)
         {
             var vkParams = new VKParams
             {
