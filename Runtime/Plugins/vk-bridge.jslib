@@ -23,7 +23,7 @@ mergeInto(LibraryManager.library, {
                     .catch(function(error) {
                         if (enableLogging) {console.log('JS:::Got inside error: ',error);}
                         var errorStr = JSON.stringify({ requestId: requestId, method: methodName, error: error });
-                        console.log('JS:::Error after parse: ',errorStr);
+                        if (enableLogging) {console.log('JS:::Error after parse: ',errorStr); }
                         gameInstance.SendMessage('VKMessageReceiver', 'ReceiveError', errorStr);
                         if (enableLogging) {console.log('JS:::JS:::Send message to unity...');}
                     });
@@ -34,9 +34,13 @@ mergeInto(LibraryManager.library, {
             console.error('JS:::JSON parse error:', e);
         }
     },
-
+    
     UnityVKBridge_GetWindowLocationHref: function () {
-        return allocate(intArrayFromString(window.location.href), 'i8', ALLOC_STACK);
+        var url = window.location.href;
+        var lengthBytes = lengthBytesUTF8(url) + 1; // Determine the length of the string in bytes, including null terminator
+        var stringOnStack = stackAlloc(lengthBytes); // Allocate memory on the stack
+        stringToUTF8(url, stringOnStack, lengthBytes); // Write the string to the allocated memory
+        return stringOnStack;
     },
     
     UnityVKBridge_Subscribe: function() {
