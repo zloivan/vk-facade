@@ -184,38 +184,25 @@ namespace vk_facade.Runtime.data
     [Serializable]
     public class VKError : VKData
     {
-        public string type;
-        public Data data;
+        [JsonProperty("error_type")]public string error_type;
+        [JsonProperty("error_data")]public ErrorData error_data;
+        [JsonProperty("request_id")]public int request_id;
 
-        public override bool IsValid => !string.IsNullOrEmpty(type) && data != null;
-
+        public override bool IsValid => error_data != null && !string.IsNullOrEmpty(error_type);
         public override string ToString()
         {
-            return $"{nameof(type)}: {type}, {nameof(data)}: {data}";
+            return
+                $"{nameof(error_type)}: {error_type}, {nameof(error_data)}: {error_data}, {nameof(request_id)}: {request_id}";
         }
-
-        [Serializable]
-        public class Data
-        {
-            public string error_type;
-            public ErrorData error_data;
-            public int request_id;
-
-            public override string ToString()
-            {
-                return
-                    $"{nameof(error_type)}: {error_type}, {nameof(error_data)}: {error_data}, {nameof(request_id)}: {request_id}";
-            }
-        }
-
+            
         [Serializable]
         public class ErrorData
         {
-            public int error_code;
-            public string error_reason;
-            public string error_description;
-            public string error_msg;
-            public int error;
+            [JsonProperty("error_code")]public int error_code;
+            [JsonProperty("error_reason")]public string error_reason;
+            [JsonProperty("error_description")]public string error_description;
+            [JsonProperty("error_msg")]public string error_msg;
+            [JsonProperty("error")]public int error;
 
             public override string ToString()
             {

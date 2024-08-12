@@ -106,7 +106,7 @@ namespace vk_facade.Runtime.data
 
             _logger.Log("PROMISE", $"Deserialized data: {jsonExceptionData}");
 
-            var data = error.data.error_data;
+            var data = error.error_data;
             var errorMessage = !string.IsNullOrEmpty(data.error_description) ? data.error_description :
                 !string.IsNullOrEmpty(data.error_msg) ? data.error_msg : data.error_reason;
 
