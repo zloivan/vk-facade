@@ -20,7 +20,7 @@ Debug menu for quick access to VK functionalities
 #### Importing the Package via Package Manager
 * Open Unity and go to Window > Package Manager.
 * Click on the + button in the top left corner and select Add package from git URL...
-* Enter the following URL: `git@github.com:zloivan/vk-facade.git`
+* Enter the following URL: `https://github.com/zloivan/vk-facade.git`
 * Click Add to import the package.
 
 #### Importing the Package via Git
