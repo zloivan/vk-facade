@@ -29,7 +29,7 @@ Debug menu for quick access to VK functionalities
 * Add the following line to the dependencies section:
 
 ```json
-"com.zloivan.vk-facade": "git@github.com:zloivan/vk-facade.git"
+"com.zloivan.vk-facade": "https://github.com/zloivan/vk-facade.git"
 ```
 Save the manifest.json file. Unity will automatically download and import the package.
 
