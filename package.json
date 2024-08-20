@@ -1,7 +1,7 @@
 {
   "name": "com.zloivan.vkbridgesdk",
   "displayName": "IKhom VKBridge SDK",
-  "version": "3.0.1",
+  "version": "4.0.0",
   "unity": "2019.1",
   "description": "Custom implementation of VKBridge SDK.",
   "keywords": [
@@ -12,10 +12,10 @@
   "repository": {
     "url": "https://github.com/zloivan/vk-facade.git",
     "type": "git",
-    "revision": "c7675e2ac83e786f92dd4c6b17c39f1e4777e061"
+    "revision": "b25baf2cca7311909f8ad4b1fc1040c98dc1f904"
   },
   "_upm": {
-    "changelog": "- try to fix paramms"},
+    "changelog": "- Change the signature of working with banner ads, not it follows official vk documentation"},
   "author": {
     "name": "Ivan Khomichkov",
     "url": "https://github.com/zloivan"

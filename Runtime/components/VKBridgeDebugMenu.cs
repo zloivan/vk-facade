@@ -214,7 +214,8 @@ namespace vk_facade.Runtime.components
         {
             try
             {
-                if (await VkBridgeFacade.CheckBannerAd()) _logger.Log("DEBUG_MENU", "Banner ad is shown");
+                var checkBannerAd = await VkBridgeFacade.CheckBannerAd();
+                if (checkBannerAd.result) _logger.Log("DEBUG_MENU", "Banner ad is shown");
             }
             catch (Exception e)
             {
@@ -226,7 +227,8 @@ namespace vk_facade.Runtime.components
         {
             try
             {
-                if (await VkBridgeFacade.HideBannerAd()) _logger.Log("DEBUG_MENU", "Banner ad is hidden");
+                var hideBannerAd = await VkBridgeFacade.HideBannerAd();
+                if (hideBannerAd.result) _logger.Log("DEBUG_MENU", "Banner ad is hidden");
             }
             catch (Exception e)
             {
@@ -238,7 +240,8 @@ namespace vk_facade.Runtime.components
         {
             try
             {
-                if (await VkBridgeFacade.ShowBannerAd()) _logger.Log("DEBUG_MENU", "Banner ad is shown");
+                var bannerResponse = await VkBridgeFacade.ShowBannerAd();
+                if (bannerResponse.result) _logger.Log("DEBUG_MENU", "Banner ad is shown");
             }
             catch (Exception e)
             {

@@ -181,56 +181,56 @@ namespace vk_facade.Runtime
             return vkPromise.result;
         }
 
+
         /// <summary>
-        /// Показать баннер
+        /// Показывает баннерную рекламу с указанными параметрами.
         /// </summary>
-        /// <param name="location"></param>
-        /// <param name="align"></param>
-        /// <param name="orientation"></param>
-        /// <param name="layout"></param>
-        /// <returns>Успешно ли прошел запрос</returns>
-        public static async UniTask<bool> ShowBannerAd(BannerLocation location = BannerLocation.bottom,
-            BannerAlign align = BannerAlign.center,
-            BannerOrientation orientation = BannerOrientation.horizontal,
-            BannerLayout layout = BannerLayout.resize)
+        /// <param name="location">Расположение баннера. По умолчанию внизу.</param>
+        /// <param name="layout">Тип макета баннера. По умолчанию resize.</param>
+        /// <param name="canClose">Указывает, может ли пользователь закрыть баннер. По умолчанию true.</param>
+        /// <returns>Задача, представляющая асинхронную операцию. Результат задачи содержит <see cref="VKBannerData"/>.</returns>
+        public static async UniTask<VKBannerData> ShowBannerAd(BannerLocation location =
+                BannerLocation.bottom,
+            BannerLayout layout = BannerLayout.resize,
+            bool canClose = true)
         {
             var parameters = new VKParams
             {
                 { "banner_location", Enum.GetName(typeof(BannerLocation), location) },
-                { "banner_align", Enum.GetName(typeof(BannerAlign), align) },
-                { "banner_orientation", Enum.GetName(typeof(BannerOrientation), orientation) },
-                { "banner_layout", Enum.GetName(typeof(BannerLayout), layout) }
+                { "layout_type", Enum.GetName(typeof(BannerLayout), layout) },
+                { "can_close", canClose }
             };
 
-            var vkPromise =
-                await _vkResponseManager.CallVkMethodAsync<VKRequestData>("VKWebAppShowBannerAd", parameters);
-
-            _logger.Log("BRIDGE_FACADE", $"ShowBannerAd got result: {vkPromise.result}");
-            return vkPromise.result;
+            var result =
+                await _vkResponseManager.CallVkMethodAsync<VKBannerData>("VKWebAppShowBannerAd",
+                    parameters);
+            
+            _logger.Log("BRIDGE_FACADE", $"ShowBannerAd got result: {result.result}");
+            return result;
         }
 
         /// <summary>
         /// Спрятать банер
         /// </summary>
-        /// <returns>Успешно ли прошел запрос</returns>
-        public static async UniTask<bool> HideBannerAd()
+        /// <returns>Задача, представляющая асинхронную операцию. Результат задачи содержит <see cref="VKBannerData"/>.</returns>
+        public static async UniTask<VKBannerData> HideBannerAd()
         {
-            var vkData = await _vkResponseManager.CallVkMethodAsync<VKRequestData>("VKWebAppHideBannerAd");
+            var vkData = await _vkResponseManager.CallVkMethodAsync<VKBannerData>("VKWebAppHideBannerAd");
 
             _logger.Log("BRIDGE_FACADE", $"HideBannerAd got result: {vkData.result}");
-            return vkData.result;
+            return vkData;
         }
 
         /// <summary>
-        /// Проверить показывается ли банер
+        /// VKWebAppCheckBannerAd проверяет, что баннерная реклама, открытая событием ShowBannerAd, показана в игре.
         /// </summary>
         /// <returns>Показываем или нет</returns>
-        public static async UniTask<bool> CheckBannerAd()
+        public static async UniTask<VKBannerData> CheckBannerAd()
         {
-            var vkData = await _vkResponseManager.CallVkMethodAsync<VKRequestData>("VKWebAppCheckBannerAd");
+            var vkData = await _vkResponseManager.CallVkMethodAsync<VKBannerData>("VKWebAppCheckBannerAd");
 
             _logger.Log("BRIDGE_FACADE", $"CheckBannerAd got result: {vkData.result}");
-            return vkData.result;
+            return vkData;
         }
 
         /// <summary>

@@ -50,6 +50,30 @@ namespace vk_facade.Runtime.data
     }
 
     [Serializable]
+    public class VKBannerData : VKData
+    {
+        [JsonProperty("result")]
+        public bool result;
+        [JsonProperty("banner_width")]        
+        public int banner_width;
+        [JsonProperty("banner_height")]   
+        public int banner_height;
+        [JsonProperty("banner_location")]
+        public string banner_location;
+        [JsonProperty("banner_align")]
+        public string banner_align;
+        [JsonProperty("height_type")]
+        public string height_type;
+        [JsonProperty("orientation")]
+        public string orientation;
+        [JsonProperty("layout_type")]
+        public string layout_type;
+        
+        [JsonIgnore]
+        public override bool IsValid => banner_width != 0 && banner_height != 0;
+    }
+
+    [Serializable]
     public class VKFriendsData : VKData // Ето не я ебанутый, это в вк так сделали
     {
         public VKUserData[] users;
