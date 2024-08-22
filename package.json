@@ -1,7 +1,7 @@
 {
   "name": "com.zloivan.vkbridgesdk",
   "displayName": "IKhom VKBridge SDK",
-  "version": "4.0.0",
+  "version": "4.0.1",
   "unity": "2019.1",
   "description": "Custom implementation of VKBridge SDK.",
   "keywords": [
@@ -12,10 +12,10 @@
   "repository": {
     "url": "https://github.com/zloivan/vk-facade.git",
     "type": "git",
-    "revision": "b25baf2cca7311909f8ad4b1fc1040c98dc1f904"
+    "revision": "d982cefe71efb30cb65b0454fdb2f42d76e60a36"
   },
   "_upm": {
-    "changelog": "- Change the signature of working with banner ads, not it follows official vk documentation"},
+    "changelog": "- Add another template for vk that is stretching game canvas to full screen"},
   "author": {
     "name": "Ivan Khomichkov",
     "url": "https://github.com/zloivan"

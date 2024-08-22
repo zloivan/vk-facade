@@ -4,6 +4,10 @@ All notable changes to this package will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+##[4.0.1] - 2024-08-22
+### Add
+* Add another template for vk that is stretching game canvas to full screen
+
 ## [4.0.0] - 2024-08-20
 ### Add / Bugfix
 * Change the signature of working with banner ads, not it follows official vk documentation
