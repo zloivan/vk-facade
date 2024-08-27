@@ -1,7 +1,7 @@
 {
   "name": "com.zloivan.vkbridgesdk",
   "displayName": "IKhom VKBridge SDK",
-  "version": "4.0.1",
+  "version": "4.0.2",
   "unity": "2019.1",
   "description": "Custom implementation of VKBridge SDK.",
   "keywords": [
@@ -15,7 +15,7 @@
     "revision": "d982cefe71efb30cb65b0454fdb2f42d76e60a36"
   },
   "_upm": {
-    "changelog": "- Add another template for vk that is stretching game canvas to full screen"},
+    "changelog": "- Fix storage behavior, in editor that was not working properly for ints and floats"},
   "author": {
     "name": "Ivan Khomichkov",
     "url": "https://github.com/zloivan"

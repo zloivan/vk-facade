@@ -121,10 +121,28 @@ namespace vk_facade.Runtime.managers
 
 
         [PublicAPI]
-        public void SetFloat(string key, float value) => SetString(key, value.ToString(CultureInfo.InvariantCulture));
+        public void SetFloat(string key, float value)
+        {
+            if (Application.isEditor)
+            {
+                PlayerPrefs.SetFloat(key, value);
+                return;
+            }
+            
+            SetString(key, value.ToString(CultureInfo.InvariantCulture));
+        }
 
         [PublicAPI]
-        public void SetInt(string key, int value) => SetString(key, value.ToString());
+        public void SetInt(string key, int value)
+        {
+            if (Application.isEditor)
+            {
+                PlayerPrefs.SetInt(key, value);
+                return;
+            }
+            
+            SetString(key, value.ToString());
+        }
 
         [PublicAPI]
         public string GetString(string key, string defaultValue)
